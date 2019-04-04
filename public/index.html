@@ -1,30 +1,186 @@
 <!doctype html>
 <html>
+   <head>
+      <title>Phidgets Rover Control Panel</title>
+      <meta charset="utf-8">
+      <meta http-equiv="X-UA-Compatible" content="IE=edge">
+      <meta name="viewport" content="width=device-width, initial-scale=1">
+      <link rel="stylesheet" media="screen" href="/css/site.css" />
+      <script src="/js/socket.io.js"></script>
+      <script src="https://code.jquery.com/jquery-3.3.1.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8="
+         crossorigin="anonymous"></script>
+      <!-- Bootstrap: Latest compiled and minified CSS -->
+      <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+      <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
+      <!-- Bootstrap Optional theme -->
+      <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap-theme.min.css" integrity="sha384-rHyoN1iRsVXV4nD0JutlnGaslCJuC7uwjduW9SVrLvRYooPp2bWYgmgJQIXwl/Sp"
+         crossorigin="anonymous">
+      <!-- mdb (Material Design) bootstrap add-on -->
+      <link rel="stylesheet" href="/css/mdb.css">
+   </head>
+   <body class="grey lighten-3">
+      <div class="container">
+         <H1 style="text-align: center;">Phidgets Rover Control Panel</H1>
+         <div class="row">
+            <div class="col-sm-8">
+               <div id="gamepadPrompt"></div>
+               <div id="gamepadDisplay"></div>
+            </div>
+         </div>
+         <div class="card-deck">
+            <div class="card">
+               <div class="card-body">
+                <h5 class="card-title">Rover Connection Status</h5>
+                  <div class="led-box">
+                     <div id="ledConnectionStatus" class="led-red"></div>
+                  </div>
+               </div>
+            </div>
+            <div class="card">
+               <div class="card-body" style="margin-left: 20px;">
+                  <br>
+                  <button type="button" class="btn btn-success" id="btnConnect" onclick="btnConnect_onClick();">Connect to
+                  rover</button><br>
+                  <button type="button" class="btn btn-primary" id="btnDisConnect"
+                     onclick="btnDisConnect_onClick();">DisConnect rover</button><br>
+                  <button type="button" class="btn btn-warning" id="btngetMotorStatus"
+                     onclick="btnCancelSteering_onClick();">Cancel
+                  Steering</button><br>
+                  <button type="button" class="btn btn-danger" id="btnstopMotor" onclick="btnStopMotor_onClick();">Stop
+                  rover</button><br>
+               </div>
+            </div>
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Rover Webcam</h5>
 
-<head>
-    <title>Phidgets Rover Control Panel</title>
-    <meta charset="utf-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link rel="stylesheet" media="screen" href="/css/site.css" />
-    <script src="/js/socket.io.js"></script>
-    <script src="https://code.jquery.com/jquery-3.3.1.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8="
-        crossorigin="anonymous"></script>
-    <!-- Bootstrap: Latest compiled and minified CSS -->
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
-<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
-
-    <!-- Bootstrap Optional theme -->
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap-theme.min.css" integrity="sha384-rHyoN1iRsVXV4nD0JutlnGaslCJuC7uwjduW9SVrLvRYooPp2bWYgmgJQIXwl/Sp"
-        crossorigin="anonymous">
-    <!-- mdb (Material Design) bootstrap add-on -->
-    <link rel="stylesheet" href="/css/mdb.css">
-
-</head>
-
-<body class="grey lighten-3">
-
-    <script>
+                </div>
+             </div>
+         </div>
+         <br><br>
+         <div class="card-columns">
+            <div class="card" style="height: 200px; ">
+               <div class="card-body">
+                <h5 class="card-title">Motor One (right front)</h5>
+                  <span id="lblMotorOneStatus"></span>
+               </div>
+            </div>
+            <div class="card" style="height: 200px; ">
+               <div class="card-body">
+                <h5 class="card-title">Motor Two (right rear)</h5>
+                  <span id="lblMotorTwoStatus"></span>
+               </div>
+            </div>
+            <div class="card" style="height: 200px; ">
+               <div class="card-body">
+                <h5 class="card-title">Motor Three (left front)</h5>
+                  <span id="lblMotorThreeStatus"></span>
+               </div>
+            </div>
+            <div class="card" style="height: 200px; ">
+               <div class="card-body">
+                <h5 class="card-title">Motor Four(left rear)</h5>
+                  <span id="lblMotorFourStatus"></span>
+               </div>
+            </div>
+            <div class="card" style="height: 200px; ">
+               <div class="card-body">
+                <h5 class="card-title">Distance Sensor: Front</h5>
+                  <span id="lbDistanceSensorFront"></span>
+               </div>
+            </div>
+            <div class="card" style="height: 200px; ">
+               <div class="card-body">
+                <h5 class="card-title">Distance Sensor: Rear</h5>
+                  <span id="lbDistanceSensorRear"></span>
+               </div>
+            </div>
+         </div>
+         <br><br>
+         <form id="form1" oninput="velocity.value = sliderVelocity.valueAsNumber">
+            <div class="card">
+               <div class="card-body">
+                     <h5 class="card-title">Velocity:</h5>
+                  <div class="Row">
+                     <div class="ColumnSm">
+                     </div>
+                     <div class="Column">
+                        <span style="text-align: center;"> <output name="velocity" id="velocity" for="sliderVelocity" class="outputVariable">0</output></span>
+                     </div>
+                     <div class="ColumnSm">
+                     </div>
+                  </div>
+                  <!--sliders are the html5 range control: https://developer.mozilla.org/en-US/docs/Web/HTML/Element/input/range -->
+                  <div class="Row">
+                     <div class="ColumnSm">
+                        <span class="sliderLabel">Backwards</span>
+                     </div>
+                     <div class="Column"><input id="sliderVelocity" name="sliderVelocity" type="range" min="-100" max="100"
+                        step="1" value="0" list="tickmarks" />
+                     </div>
+                     <div class="ColumnSm"> <span class="sliderLabel"> Forwards</span>
+                     </div>
+                  </div>
+                  <datalist id="tickmarks">
+                     <option label="Stopped">0</option>
+                     <option>-10</option>
+                     <option>-20</option>
+                     <option>-30</option>
+                     <option>-40</option>
+                     <option>-50</option>
+                     <option>-60</option>
+                     <option>-70</option>
+                     <option>-80</option>
+                     <option>-90</option>
+                     <option>-100</option>
+                     <option>10</option>
+                     <option value="20">
+                     <option>30</option>
+                     <option>40</option>
+                     <option>50</option>
+                     <option>60</option>
+                     <option>70</option>
+                     <option>80</option>
+                     <option>90</option>
+                     <option>100</option>
+                  </datalist>
+               </div>
+            </div>
+         </form>
+         <br><br>
+         <div class="card">
+            <div class="card-body">
+                  <h5 class="card-title">Steering:</h5>
+               <form id="form2" oninput="steerVector.value = sliderSteering.valueAsNumber">
+                  <div class="Row">
+                     <div class="ColumnSm">
+                     </div>
+                     <div class="Column">
+                        <span style="text-align: center;">
+                        <output name="steerVector" id="steerVector" for="sliderSteering"
+                           class="outputVariable">0</output>
+                        </span>
+                     </div>
+                     <div class="ColumnSm">
+                     </div>
+                  </div>
+                  <div class="Row">
+                     <div class="ColumnSm">
+                        <span class="sliderLabel">Left</span>
+                     </div>
+                     <div class="Column">
+                        <input id="sliderSteering" name="sliderSteering" type="range" min="-10" max="10" step=".1"
+                           value="0" />
+                     </div>
+                     <div class="ColumnSm">
+                        <span class="sliderLabel">Right</span>
+                     </div>
+                  </div>
+               </form>
+            </div>
+         </div>
+      </div>
+      <script>
         var hasGP = false; // has Gampepad
         var repGP; // timer for Gamepad
         var broverIsConnected = false;
@@ -230,167 +386,6 @@
             return "getGamepads" in navigator;
         }
 
-    </script>
-    <div class="container">
-            <H1>Phidgets Rover Control Panel</H1>
-        <div class="row">
-            <div class="col-sm-8">
-                <div id="gamepadPrompt"></div>
-                <div id="gamepadDisplay"></div>
-            </div>
-        </div>
-        <div class="card-deck">
-            <div class="card">
-                <div class="card-body">
-                    <div class="card-title">Rover Connection Status</div>
-                    <div class="led-box">
-                        <div id="ledConnectionStatus" class="led-red"></div>
-                    </div>
-
-                </div>
-            </div>
-            <div class="card">
-                <div class="card-body" style="margin-left: 20px;">
-                    <br>
-                    <button type="button" class="btn btn-success" id="btnConnect" onclick="btnConnect_onClick();">Connect to
-                        rover</button><br>
-                    <button type="button" class="btn btn-primary" id="btnDisConnect"
-                        onclick="btnDisConnect_onClick();">DisConnect rover</button><br>
-                    <button type="button" class="btn btn-warning" id="btngetMotorStatus"
-                        onclick="btnCancelSteering_onClick();">Cancel
-                        Steering</button><br>
-                    <button type="button" class="btn btn-danger" id="btnstopMotor" onclick="btnStopMotor_onClick();">Stop
-                        rover</button><br>
-                </div>
-            </div>
-        </div>
-        <br><br>
-        <div class="card-deck">
-            <div class="card" style="height: 200px; ">
-                <div class="card-body">
-                    <div class="card-title"><span class="label label-primary">Motor One (right front)</span>
-                    </div>
-                    <span id="lblMotorOneStatus"></span>
-                </div>
-            </div>
-
-            <div class="card" style="height: 200px; ">
-                <div class="card-body">
-                    <div class="card-title"> <span class="label label-primary">Motor Two (right rear)</span>
-                    </div>
-                    <span id="lblMotorTwoStatus"></span>
-                </div>
-            </div>
-
-            <div class="card" style="height: 200px; ">
-                <div class="card-body">
-                    <div class="card-title"><span class="label label-primary">Motor Three (left front)</span>
-                    </div>
-                    <span id="lblMotorThreeStatus"></span>
-                </div>
-            </div>
-
-            <div class="card" style="height: 200px; ">
-                <div class="card-body">
-                    <div class="card-title"> <span class="label label-primary">Motor Four(left rear)</span>
-                    </div>
-                    <span id="lblMotorFourStatus"></span>
-                </div>
-            </div>
-        </div>
-<br><br>
-        <form id="form1" oninput="velocity.value = sliderVelocity.valueAsNumber">
-            <div class="card">
-                <div class="card-bdy">
-                    <div class="card-title">
-                            <h3>Velocity:</h3>
-                    </div>
-            <div class="Row">
-                <div class="ColumnSm">
-                </div>
-                <div class="Column">
-                    <span style="text-align: center;"> <output name="velocity" id="velocity" for="sliderVelocity" class="outputVariable">0</output></span>
-                </div>
-                <div class="ColumnSm">
-                </div>
-            </div>
-            <!--sliders are the html5 range control: https://developer.mozilla.org/en-US/docs/Web/HTML/Element/input/range -->
-            <div class="Row">
-                <div class="ColumnSm">
-
-                    <span class="sliderLabel"></span>Backwards</span>
-                </div>
-                <div class="Column"><input id="sliderVelocity" name="sliderVelocity" type="range" min="-100" max="100"
-                        step="1" value="0" list="tickmarks" />
-                </div>
-                <div class="ColumnSm"> <span class="sliderLabel"> Forwards</span>
-                </div>
-            </div>
-            <datalist id="tickmarks">
-                <option label="Stopped">0</option>
-                <option>-10</option>
-                <option>-20</option>
-                <option>-30</option>
-                <option>-40</option>
-                <option>-50</option>
-                <option>-60</option>
-                <option>-70</option>
-                <option>-80</option>
-                <option>-90</option>
-                <option>-100</option>
-                <option>10</option>
-                <option value="20">
-                <option>30</option>
-                <option>40</option>
-                <option>50</option>
-                <option>60</option>
-                <option>70</option>
-                <option>80</option>
-                <option>90</option>
-                <option>100</option>
-            </datalist>
-
-
-        </form>
-        </div>
-    </div>
-    <br><br>
-    <div class="card">
-            <div class="card-bdy">
-                <div class="card-title">
-            <h3>Steering</h3>
-            </div>
-            <form id="form2" oninput="steerVector.value = sliderSteering.valueAsNumber">
-                <div class="Row">
-                    <div class="ColumnSm">
-                    </div>
-                    <div class="Column">
-                        <span style="text-align: center;"> <output name="steerVector" id="steerVector" for="sliderSteering"
-                                class="outputVariable">0</output>
-                    </div>
-                    <div class="ColumnSm">
-                    </div>
-                </div>
-
-                <div class="Row">
-                    <div class="ColumnSm">
-
-                        <span class="sliderLabel"></span>Left</span>
-                    </div>
-                    <div class="Column">
-                        <input id="sliderSteering" name="sliderSteering" type="range" min="-10" max="10" step=".1"
-                            value="0" />
-                    </div>
-                    <div class="ColumnSm">
-
-                        <span class="sliderLabel"></span>Right</span>
-                    </div>
-                </div>
-            </form>
-</div></div>
-        </div>
-    </div>
-
-</body>
-
+     </script>
+   </body>
 </html>
