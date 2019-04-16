@@ -3,10 +3,14 @@ const pubsub = require('pubsub-js');
 const global = require('./constants');
 const math = require('mathjs'); // for accurate math in the steering function
 
-const ch1 = new phidget22.DCMotor();// right wheels
-const ch2 = new phidget22.DCMotor();// right wheels
-const ch3 = new phidget22.DCMotor();// left wheels
-const ch4 = new phidget22.DCMotor();// left wheels
+const ch1 = new phidget22.DCMotor();// right front motor controller
+const tp1 = new phidget22.TemperatureSensor(); // right front temperature sensor
+const ch2 = new phidget22.DCMotor();// right rear motor controller
+const tp2 = new phidget22.TemperatureSensor(); // right rear temperature sensor
+const ch3 = new phidget22.DCMotor();// left front motor controller
+const tp3 = new phidget22.TemperatureSensor(); // left front temperature sensor
+const ch4 = new phidget22.DCMotor();// left rear motor controller
+const tp4 = new phidget22.TemperatureSensor(); // left rear temperature sensor
 
 var velocity = 0.00; // current velocity before steering adjustments
 //
@@ -139,14 +143,45 @@ exports.phidgetServer = function () {
             console.log(`failed to open the channel: ${err}`);
         });
     }
+    var startTemperatureSensor = function(_ch, hubSerialNumber, hubPort)
+    {
+        _ch.isRemote = true;
+        _ch.setDeviceSerialNumber(hubSerialNumber);
+        _ch.setChannel(0);
+        _ch.setHubPort(hubPort);
+
+        _ch.onAttach = function (ch) {
+            console.log(ch + ' attached');
+            console.log('min temperature:' + ch.getMinTemperature());
+            console.log('max temperature:' + ch.getMaxTemperature());
+        };
+
+        _ch.onDetach = function (ch) {
+            console.log(ch + ' detached');
+        };
+
+        _ch.onTemperatureChange = function (temp) {
+            console.log('temperature:' + temp + ' (' + this.getTemperature() + ')');
+        };
+
+        _ch.open().then(function (ch) {
+            console.log('temperature channel open');
+        }).catch(function (err) {
+            console.log('failed to open the channel:' + err);
+        });
+
+    }
     var startMotors = function () {
         //start right side motors
         startMotor(ch1, motorRightFront.hubSerialNumber, motorRightFront.hubPort)
+        startTemperatureSensor(tp1,motorRightFront.hubSerialNumber, motorRightFront.hubPort)
         startMotor(ch2, motorRightRear.hubSerialNumber, motorRightRear.hubPort)
-
+        startTemperatureSensor(tp2, motorRightRear.hubSerialNumber, motorRightRear.hubPort)
         // start left side motors
         startMotor(ch3, motorLeftFront.hubSerialNumber, motorLeftFront.hubPort);
+        startTemperatureSensor(tp3,motorLeftFront.hubSerialNumber, motorLeftFront.hubPort);
         startMotor(ch4, motorLeftRear.hubSerialNumber, motorLeftRear.hubPort);
+        startTemperatureSensor(tp4,motorLeftRear.hubSerialNumber, motorLeftRear.hubPort);
     }
     var getVelocity = function () {
         var responseArray = new Array(4);

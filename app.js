@@ -50,7 +50,7 @@ const socketServer = function () {
 
     io.on('connection', function (socket) {
       console.log('user connected');
-      socket.on('connectStalker', function (data) {
+      socket.on('connectRover', function (data) {
         if (data == 'true') {
           console.log("connection request received");
           pubsub.publish(global.roverconnection_command, "connect");
@@ -108,10 +108,10 @@ const socketServer = function () {
       });
       pubsub.subscribe(global.roverconnection_status, function (msg, data) {
         if (data == "connected") {
-          socket.emit('connectionStatus', 'Stalker is connected');
+          socket.emit('connectionStatus', 'Rover is connected');
         }
         else if (data == "disconnected") {
-          socket.emit('connectionStatus', 'Stalker is not connected');
+          socket.emit('connectionStatus', 'Rover is not connected');
         }
       });
       pubsub.subscribe(global.rovervelocity_statusreport, function (msg, data) {
@@ -131,7 +131,7 @@ const socketServer = function () {
     if (status == "on") {
       io.on('connection', function (socket) {
         {
-          socket.emit('connectionStatus', 'Stalker is connected');
+          socket.emit('connectionStatus', 'Rover is connected');
         }
       });
     }

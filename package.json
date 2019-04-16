@@ -1,11 +1,13 @@
 {
-  "name": "phidgetsrover",
-  "version": "0.0.0",
-  "private": true,
+  "name": "stalker",
+  "version": "0.1.0",
+  "description": "Controller for 4 motor rover",
+  "main": "index.js",
   "scripts": {
-    "start": "node ./bin/www"
+    "test": "echo \"Error: no test specified\" && exit 1"
   },
   "dependencies": {
+    "canvas-gauges": "^2.1.5",
     "cookie-parser": "~1.4.3",
     "debug": "~2.6.9",
     "express": "~4.16.0",

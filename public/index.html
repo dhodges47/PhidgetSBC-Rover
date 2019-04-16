@@ -1,320 +1,438 @@
-<!doctype html>
+<!DOCTYPE html>
 <html>
-   <head>
-      <title>Phidgets Rover Control Panel</title>
-      <meta charset="utf-8">
-      <meta http-equiv="X-UA-Compatible" content="IE=edge">
-      <meta name="viewport" content="width=device-width, initial-scale=1">
-      <link rel="stylesheet" media="screen" href="/css/site.css" />
-      <script src="/js/socket.io.js"></script>
-      <script src="https://code.jquery.com/jquery-3.3.1.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8="
-         crossorigin="anonymous"></script>
-      <!-- Bootstrap: Latest compiled and minified CSS -->
-      <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
-      <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
-      <!-- Bootstrap Optional theme -->
-      <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap-theme.min.css" integrity="sha384-rHyoN1iRsVXV4nD0JutlnGaslCJuC7uwjduW9SVrLvRYooPp2bWYgmgJQIXwl/Sp"
-         crossorigin="anonymous">
-      <!-- mdb (Material Design) bootstrap add-on -->
-      <link rel="stylesheet" href="/css/mdb.css">
-   </head>
-   <body class="grey lighten-3">
-      <div class="container">
-         <H1 style="text-align: center;">Phidgets Rover Control Panel</H1>
-         <div class="row">
-            <div class="col-sm-8">
-               <div id="gamepadPrompt"></div>
-               <div id="gamepadDisplay"></div>
-            </div>
-         </div>
-         <div class="card-deck">
-            <div class="card">
-               <div class="card-body">
-                <h5 class="card-title">Rover Connection Status</h5>
-                  <div class="led-box">
-                     <div id="ledConnectionStatus" class="led-red"></div>
-                  </div>
-               </div>
-            </div>
-            <div class="card">
-               <div class="card-body" style="margin-left: 20px;">
-                  <br>
-                  <button type="button" class="btn btn-success" id="btnConnect" onclick="btnConnect_onClick();">Connect to
-                  rover</button><br>
-                  <button type="button" class="btn btn-primary" id="btnDisConnect"
-                     onclick="btnDisConnect_onClick();">DisConnect rover</button><br>
-                  <button type="button" class="btn btn-warning" id="btngetMotorStatus"
-                     onclick="btnCancelSteering_onClick();">Cancel
-                  Steering</button><br>
-                  <button type="button" class="btn btn-danger" id="btnstopMotor" onclick="btnStopMotor_onClick();">Stop
-                  rover</button><br>
-               </div>
-            </div>
-            <div class="card">
-                <div class="card-body">
-                    <h5 class="card-title">Rover Webcam</h5>
-
-                </div>
-             </div>
-         </div>
-         <br><br>
-         <div class="card-columns">
-            <div class="card" style="height: 200px; ">
-               <div class="card-body">
-                <h5 class="card-title">Motor One (right front)</h5>
-                  <span id="lblMotorOneStatus"></span>
-               </div>
-            </div>
-            <div class="card" style="height: 200px; ">
-               <div class="card-body">
-                <h5 class="card-title">Motor Two (right rear)</h5>
-                  <span id="lblMotorTwoStatus"></span>
-               </div>
-            </div>
-            <div class="card" style="height: 200px; ">
-               <div class="card-body">
-                <h5 class="card-title">Motor Three (left front)</h5>
-                  <span id="lblMotorThreeStatus"></span>
-               </div>
-            </div>
-            <div class="card" style="height: 200px; ">
-               <div class="card-body">
-                <h5 class="card-title">Motor Four(left rear)</h5>
-                  <span id="lblMotorFourStatus"></span>
-               </div>
-            </div>
-            <div class="card" style="height: 200px; ">
-               <div class="card-body">
-                <h5 class="card-title">Distance Sensor: Front</h5>
-                  <span id="lbDistanceSensorFront"></span>
-               </div>
-            </div>
-            <div class="card" style="height: 200px; ">
-               <div class="card-body">
-                <h5 class="card-title">Distance Sensor: Rear</h5>
-                  <span id="lbDistanceSensorRear"></span>
-               </div>
-            </div>
-         </div>
-         <br><br>
-         <form id="form1" oninput="velocity.value = sliderVelocity.valueAsNumber">
-            <div class="card">
-               <div class="card-body">
-                     <h5 class="card-title">Velocity:</h5>
-                  <div class="Row">
-                     <div class="ColumnSm">
-                     </div>
-                     <div class="Column">
-                        <span style="text-align: center;"> <output name="velocity" id="velocity" for="sliderVelocity" class="outputVariable">0</output></span>
-                     </div>
-                     <div class="ColumnSm">
-                     </div>
-                  </div>
-                  <!--sliders are the html5 range control: https://developer.mozilla.org/en-US/docs/Web/HTML/Element/input/range -->
-                  <div class="Row">
-                     <div class="ColumnSm">
-                        <span class="sliderLabel">Backward</span>
-                     </div>
-                     <div class="Column"><input id="sliderVelocity" name="sliderVelocity" type="range" min="-100" max="100"
-                        step="1" value="0" list="tickmarks" />
-                     </div>
-                     <div class="ColumnSm"> <span class="sliderLabel"> Forward</span>
-                     </div>
-                  </div>
-                  <datalist id="tickmarks">
-                     <option label="Stopped">0</option>
-                     <option>-10</option>
-                     <option>-20</option>
-                     <option>-30</option>
-                     <option>-40</option>
-                     <option>-50</option>
-                     <option>-60</option>
-                     <option>-70</option>
-                     <option>-80</option>
-                     <option>-90</option>
-                     <option>-100</option>
-                     <option>10</option>
-                     <option value="20">
-                     <option>30</option>
-                     <option>40</option>
-                     <option>50</option>
-                     <option>60</option>
-                     <option>70</option>
-                     <option>80</option>
-                     <option>90</option>
-                     <option>100</option>
-                  </datalist>
-               </div>
-            </div>
-         </form>
-         <br><br>
-         <div class="card">
-            <div class="card-body">
-                  <h5 class="card-title">Steering:</h5>
-               <form id="form2" oninput="steerVector.value = sliderSteering.valueAsNumber">
-                  <div class="Row">
-                     <div class="ColumnSm">
-                     </div>
-                     <div class="Column">
-                        <span style="text-align: center;">
-                        <output name="steerVector" id="steerVector" for="sliderSteering"
-                           class="outputVariable">0</output>
-                        </span>
-                     </div>
-                     <div class="ColumnSm">
-                     </div>
-                  </div>
-                  <div class="Row">
-                     <div class="ColumnSm">
-                        <span class="sliderLabel">Left</span>
-                     </div>
-                     <div class="Column">
-                        <input id="sliderSteering" name="sliderSteering" type="range" min="-10" max="10" step=".1"
-                           value="0" />
-                     </div>
-                     <div class="ColumnSm">
-                        <span class="sliderLabel">Right</span>
-                     </div>
-                  </div>
-               </form>
-            </div>
-         </div>
+  <head>
+    <title>Phidgets Rover Control Panel</title>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="stylesheet" media="screen" href="/css/site.css" />
+    <script src="/js/socket.io.js"></script>
+    <script
+      src="https://code.jquery.com/jquery-3.3.1.min.js"
+      integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8="
+      crossorigin="anonymous"
+    ></script>
+    <!-- Bootstrap: Latest compiled and minified CSS -->
+    <link
+      rel="stylesheet"
+      href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
+      integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T"
+      crossorigin="anonymous"
+    />
+    <script
+      src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"
+      integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM"
+      crossorigin="anonymous"
+    ></script>
+    <!-- Bootstrap Optional theme -->
+    <link
+      rel="stylesheet"
+      href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap-theme.min.css"
+      integrity="sha384-rHyoN1iRsVXV4nD0JutlnGaslCJuC7uwjduW9SVrLvRYooPp2bWYgmgJQIXwl/Sp"
+      crossorigin="anonymous"
+    />
+    <!-- mdb (Material Design) bootstrap add-on -->
+    <link rel="stylesheet" href="/css/mdb.css" />
+    <!--Canvas-guages-->
+    <script src="/js/gauge.min.js"></script>
+  </head>
+  <body class="grey lighten-3">
+    <div class="container">
+      <H1 style="text-align: center;">Phidgets Rover Control Panel</H1>
+      <div class="row">
+        <div class="col-sm-8">
+          <div id="gamepadPrompt"></div>
+          <div id="gamepadDisplay"></div>
+        </div>
       </div>
-      <script>
-        var hasGP = false; // has Gampepad
-        var repGP; // timer for Gamepad
-        var broverIsConnected = false;
-        // transport object for the Gampad values we are interested in
-        // supports buttons and the two axes
-        // (doesn't support triggers and other functions)
-        var GPTransport = {};
-        // buttons
-        GPTransport.ButtonA = "";
-        GPTransport.ButtonB = "";
-        GPTransport.ButtonX = "";
-        GPTransport.ButtonY = "";
-        // axes (ie thumbsticks)
-        GPTransport.LeftX = 0.00;
-        GPTransport.LeftY = 0.00;
-        GPTransport.RightX = 0.00;
-        GPTransport.RightY = 0.00;
-        var GPTransportCurrent = {}; // current parameters that have already been sent to the robot
-        $(function () {
+      <div class="card-deck">
+        <div class="card">
+          <div class="card-body text-center">
+            <h5 class="card-title">Rover Connection Status</h5>
+            <div class="led-box">
+              <div id="ledConnectionStatus" class="led-red"></div>
+            </div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-body text-center" style="margin-left: 20px;">
+            <br />
+            <button
+              type="button"
+              class="btn btn-success"
+              id="btnConnect"
+              onclick="btnConnect_onClick();"
+            >
+              Connect to rover</button
+            ><br />
+            <button
+              type="button"
+              class="btn btn-primary"
+              id="btnDisConnect"
+              onclick="btnDisConnect_onClick();"
+            >
+              DisConnect rover</button
+            ><br />
+            <button
+              type="button"
+              class="btn btn-warning"
+              id="btngetMotorStatus"
+              onclick="btnCancelSteering_onClick();"
+            >
+              Cancel Steering</button
+            ><br />
+            <button
+              type="button"
+              class="btn btn-danger"
+              id="btnstopMotor"
+              onclick="btnStopMotor_onClick();"
+            >
+              Stop rover</button
+            ><br />
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-body">
+            <h5 class="card-title">Rover Webcam</h5>
+          </div>
+        </div>
+      </div>
+      <br /><br />
+      <div class="card-columns">
+        <div class="card" style="height: 220px; ">
+          <div class="card-body text-center">
+            <h5 class="card-title">Motor One (right front)</h5>
+            <span id="lblMotorOneStatus"></span>
+            <canvas
+            id="gaugeMotor1"
+              data-type="radial-gauge"
+              data-value="0"
+              data-width="150"
+              data-height="150"
+              data-bar-width="10"
+              data-bar-shadow="5"
+              data-color-bar-progress="rgba(50,200,50,.75)"
+            ></canvas>
+          </div>
+        </div>
+        <div class="card align-items-center" style="height: 220px; ">
+          <div class="card-body text-center">
+            <h5 class="card-title">Motor Two (right rear)</h5>
 
-            const socket = io('http://localhost:3001');
+            <span id="lblMotorTwoStatus"></span>
+            <canvas
+            id="gaugeMotor2"
+              data-type="radial-gauge"
+              data-value="0"
+              data-width="150"
+              data-height="150"
+              data-bar-width="10"
+              data-bar-shadow="5"
+              data-color-bar-progress="rgba(50,200,50,.75)"
+            ></canvas>
+          </div>
+        </div>
+        <div class="card" style="height: 220px; ">
+          <div class="card-body text-center">
+            <h5 class="card-title">Motor Three (left front)</h5>
+            <span id="lblMotorThreeStatus"></span>
+            <canvas
+            id="gaugeMotor3"
+              data-type="radial-gauge"
+              data-value="0"
+              data-width="150"
+              data-height="150"
+              data-bar-width="10"
+              data-bar-shadow="5"
+              data-color-bar-progress="rgba(50,200,50,.75)"
+            ></canvas>
+          </div>
+        </div>
+        <div class="card" style="height: 220px; ">
+          <div class="card-body text-center">
+            <h5 class="card-title">Motor Four(left rear)</h5>
+            <span id="lblMotorFourStatus"></span>
+            <canvas
+            id="gaugeMotor4"
+              data-type="radial-gauge"
+              data-value="0"
+              data-width="150"
+              data-height="150"
+              data-bar-width="10"
+              data-bar-shadow="5"
+              data-color-bar-progress="rgba(50,200,50,.75)"
+            ></canvas>
+          </div>
+        </div>
+      </div>
+        <div class="card" style="height: 200px; ">
+          <div class="card-body text-center">
+            <h5 class="card-title">Distance Sensor: Front</h5>
+            <span id="lbDistanceSensorFront"></span>
+            <canvas data-type="linear-gauge"></canvas>
+          </div>
+        </div>
+        <div class="card" style="height: 200px; ">
+          <div class="card-body text-center">
+            <h5 class="card-title">Distance Sensor: Rear</h5>
+            <span id="lbDistanceSensorRear"></span>
+            <canvas data-type="linear-gauge"></canvas>
+          </div>
+        </div>
+      <br /><br />
+      <form id="form1" oninput="velocity.value = sliderVelocity.valueAsNumber">
+        <div class="card">
+          <div class="card-body">
+            <h5 class="card-title">Velocity:</h5>
+            <div class="Row">
+              <div class="ColumnSm"></div>
+              <div class="Column">
+                <span style="text-align: center;">
+                  <output
+                    name="velocity"
+                    id="velocity"
+                    for="sliderVelocity"
+                    class="outputVariable"
+                    >0</output
+                  ></span
+                >
+              </div>
+              <div class="ColumnSm"></div>
+            </div>
+            <!--sliders are the html5 range control: https://developer.mozilla.org/en-US/docs/Web/HTML/Element/input/range -->
+            <div class="Row">
+              <div class="ColumnSm">
+                <span class="sliderLabel">Backward</span>
+              </div>
+              <div class="Column">
+                <input
+                  id="sliderVelocity"
+                  name="sliderVelocity"
+                  type="range"
+                  min="-100"
+                  max="100"
+                  step="1"
+                  value="0"
+                  list="tickmarks"
+                />
+              </div>
+              <div class="ColumnSm">
+                <span class="sliderLabel"> Forward</span>
+              </div>
+            </div>
+            <datalist id="tickmarks">
+              <option label="Stopped">0</option>
+              <option>-10</option>
+              <option>-20</option>
+              <option>-30</option>
+              <option>-40</option>
+              <option>-50</option>
+              <option>-60</option>
+              <option>-70</option>
+              <option>-80</option>
+              <option>-90</option>
+              <option>-100</option>
+              <option>10</option>
+              <option value="20"> </option>
+              <option>30</option>
+              <option>40</option>
+              <option>50</option>
+              <option>60</option>
+              <option>70</option>
+              <option>80</option>
+              <option>90</option>
+              <option>100</option>
+            </datalist>
+          </div>
+        </div>
+      </form>
+      <br /><br />
+      <div class="card">
+        <div class="card-body">
+          <h5 class="card-title">Steering:</h5>
+          <form
+            id="form2"
+            oninput="steerVector.value = sliderSteering.valueAsNumber"
+          >
+            <div class="Row">
+              <div class="ColumnSm"></div>
+              <div class="Column">
+                <span style="text-align: center;">
+                  <output
+                    name="steerVector"
+                    id="steerVector"
+                    for="sliderSteering"
+                    class="outputVariable"
+                    >0</output
+                  >
+                </span>
+              </div>
+              <div class="ColumnSm"></div>
+            </div>
+            <div class="Row">
+              <div class="ColumnSm">
+                <span class="sliderLabel">Left</span>
+              </div>
+              <div class="Column">
+                <input
+                  id="sliderSteering"
+                  name="sliderSteering"
+                  type="range"
+                  min="-10"
+                  max="10"
+                  step=".1"
+                  value="0"
+                />
+              </div>
+              <div class="ColumnSm">
+                <span class="sliderLabel">Right</span>
+              </div>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+    <script>
+      var hasGP = false; // has Gampepad
+      var repGP; // timer for Gamepad
+      var bRover = false;
+      // transport object for the Gampad values we are interested in
+      // supports buttons and the two axes
+      // (doesn't support triggers and other functions)
+      var GPTransport = {};
+      // buttons
+      GPTransport.ButtonA = "";
+      GPTransport.ButtonB = "";
+      GPTransport.ButtonX = "";
+      GPTransport.ButtonY = "";
+      // axes (ie thumbsticks)
+      GPTransport.LeftX = 0.0;
+      GPTransport.LeftY = 0.0;
+      GPTransport.RightX = 0.0;
+      GPTransport.RightY = 0.0;
+      var GPTransportCurrent = {}; // current parameters that have already been sent to the robot
 
+      $(function() {
 
-            socket.on('news', function (data) {
-                console.log(data);
-                socket.emit('my other event', { my: 'data' });
+         // initialize socket communication with server
+        const socket = io("http://localhost:3001");
+
+        socket.on("news", function(data) {
+          console.log(data);
+          socket.emit("my other event", { my: "data" });
+        });
+        socket.on("connectionStatus", function(data) {
+          UpdateRoverConnectionStatus(data);
+
+          console.log(data);
+        });
+        socket.on("velocityReport", function(data) {
+          var velocityArray = JSON.parse(data);
+          $("#lblMotorOneStatus").text(velocityArray[0]);
+          $("#lblMotorTwoStatus").text(velocityArray[1]);
+          $("#lblMotorThreeStatus").text(velocityArray[2]);
+          $("#lblMotorFourStatus").text(velocityArray[3]);
+          var gauge1 = document.gauges.get('gaugeMotor1');
+      var gauge2 = document.gauges.get('gaugeMotor2');
+      var gauge3 = document.gauges.get('gaugeMotor3');
+      var gauge4 = document.gauges.get('gaugeMotor4');
+         gauge1.value = Math.abs(velocityArray[0]*100);
+         gauge2.value = Math.abs(velocityArray[1]*100);
+         gauge3.value = Math.abs(velocityArray[2]*100);
+         gauge4.value = Math.abs(velocityArray[3]*100);
+        });
+        socket.on("errorReport", function(data) {
+          var errorMessage = data;
+          $("#lblError").text(errorMessage);
+          socket.emit("motorstatus", "");
+        });
+        sendMessage = function() {
+          socket.emit("chat message", $("#m").val());
+          $("#m").val("");
+          return false;
+        };
+        // button event handlers
+        btnConnect_onClick = function() {
+          $("#ledConnectionStatus").attr("class", "led-yellow");
+          socket.emit("connectRover", "true");
+          startGamePad();
+          resetSliders();
+          return false;
+        };
+        btnDisConnect_onClick = function() {
+          $("#ledConnectionStatus").attr("class", "led-yellow");
+          socket.emit("connectRover", { setting: "false" });
+          resetSliders();
+          return false;
+        };
+        btnGetMotorStatus_onClick = function() {
+          socket.emit("motorstatus", "");
+        };
+        btnStopMotor_onClick = function() {
+          socket.emit("steering", "0");
+          socket.emit("velocity", "0");
+          setTimeout(() => {
+            socket.emit("motorstatus", "");
+          }, 250);
+          resetSliders();
+        };
+        btnCancelSteering_onClick = function() {
+          socket.emit("steering", 0);
+          setTimeout(() => {
+            socket.emit("motorstatus", "");
+          }, 250);
+          document.getElementById("sliderSteering").value = "0";
+          document.getElementById("steerVector").value = "";
+        };
+        // slider event handlers
+        $("#sliderVelocity").on("input", function() {
+          var newVelocity = $(this).val();
+          if (newVelocity < 7 && newVelocity > -7) {
+            newVelocity = 0;
+          }
+          socket.emit("velocity", newVelocity);
+          setTimeout(() => {
+            socket.emit("motorstatus", "");
+          }, 250);
+        });
+        $("#sliderSteering").on("input", function() {
+          var newSteering = $(this).val();
+          console.log("New steering vector is " + newSteering);
+          if (newSteering < 1 && newSteering > -1) {
+            newSteering = 0;
+            document.getElementById("sliderSteering").value = "0";
+          }
+          socket.emit("steering", newSteering);
+          setTimeout(() => {
+            socket.emit("motorstatus", "");
+          }, 250);
+        });
+
+        //
+        // handlers for GamePad
+        //
+        function startGamePad() {
+          if (canGame()) {
+            var prompt =
+              "To begin using your gamepad, connect it and press any button!";
+            $("#gamepadPrompt").text(prompt);
+
+            $(window).on("gamepadconnected", function() {
+              hasGP = true;
+              $("#gamepadPrompt").html("Gamepad connected!");
+              console.log("Gamepad connection event");
+              repGP = window.setInterval(reportOnGamepad, 500);
             });
-            socket.on('connectionStatus', function (data) {
-                UpdateroverConnectionStatus(data);
 
-                console.log(data);
-            });
-            socket.on('velocityReport', function (data) {
-                var velocityArray = JSON.parse(data);
-                $('#lblMotorOneStatus').text(velocityArray[0]);
-                $('#lblMotorTwoStatus').text(velocityArray[1]);
-                $('#lblMotorThreeStatus').text(velocityArray[2]);
-                $('#lblMotorFourStatus').text(velocityArray[3]);
-
-            });
-            socket.on('errorReport', function (data) {
-                var errorMessage = data;
-                $('#lblError').text(errorMessage);
-                socket.emit('motorstatus', '');
-
-
-            });
-            sendMessage = function () {
-                socket.emit('chat message', $('#m').val());
-                $('#m').val('');
-                return false;
-            };
-            btnConnect_onClick = function () {
-                $('#ledConnectionStatus').attr('class', 'led-yellow');
-                socket.emit('connectrover', 'true');
-                startGamePad();
-                resetSliders();
-                return false;
-            };
-            btnDisConnect_onClick = function () {
-                $('#ledConnectionStatus').attr('class', 'led-yellow');
-                socket.emit('connectrover', { setting: 'false' });
-                resetSliders();
-                return false;
-            };
-            btnGetMotorStatus_onClick = function () {
-                socket.emit('motorstatus', '');
-            };
-            btnStopMotor_onClick = function () {
-                socket.emit('steering', '0');
-                socket.emit('velocity', '0')
-                setTimeout(() => {
-                    socket.emit('motorstatus', '');
-                }, 250);
-                resetSliders();
-            };
-            btnCancelSteering_onClick = function () {
-                socket.emit('steering', 0);
-                setTimeout(() => {
-                    socket.emit('motorstatus', '');
-                }, 250);
-                document.getElementById("sliderSteering").value = "0";
-                document.getElementById("steerVector").value = "";
-            };
-            $('#sliderVelocity').on('input', function () {
-                var newVelocity = $(this).val();
-                if (newVelocity < 7 && newVelocity > -7) {
-                    newVelocity = 0;
-                }
-                socket.emit('velocity', newVelocity)
-                setTimeout(() => {
-                    socket.emit('motorstatus', '');
-                }, 250);
-
-            });
-            $('#sliderSteering').on('input', function () {
-                var newSteering = $(this).val();
-                console.log('New steering vector is ' + newSteering)
-                if (newSteering < 1 && newSteering > -1) {
-                    newSteering = 0;
-                    document.getElementById("sliderSteering").value = "0";
-                }
-                socket.emit('steering', newSteering);
-                setTimeout(() => {
-                    socket.emit('motorstatus', '');
-                }, 250);
-
+            $(window).on("gamepaddisconnected", function() {
+              console.log("Gamepad disconnection event");
+              $("#gamepadPrompt").text(prompt);
+              window.clearInterval(repGP);
+              GPTransportCurrent = {};
             });
 
-            //
-            // handlers for GamePad
-            //
-            function startGamePad() {
-                if (canGame()) {
-
-                    var prompt = "To begin using your gamepad, connect it and press any button!";
-                    $("#gamepadPrompt").text(prompt);
-
-                    $(window).on("gamepadconnected", function () {
-                        hasGP = true;
-                        $("#gamepadPrompt").html("Gamepad connected!");
-                        console.log("Gamepad connection event");
-                        repGP = window.setInterval(reportOnGamepad, 500);
-                    });
-
-                    $(window).on("gamepaddisconnected", function () {
-                        console.log("Gamepad disconnection event");
-                        $("#gamepadPrompt").text(prompt);
-                        window.clearInterval(repGP);
-                        GPTransportCurrent = {};
-                    });
-
-                    //setup an interval for Chrome
-                    /* var checkGP = window.setInterval(function () {
+            //setup an interval for Chrome
+            /* var checkGP = window.setInterval(function () {
                          console.log('checkGP');
                          if (navigator.getGamepads()[0]) {
                              if (!hasGP) $(window).trigger("gamepadconnected");
@@ -322,70 +440,67 @@
                          }
                      }, 500);
                      */
-                }
-            }
-            function reportOnGamepad() {
-                console.log("In reportOnGamePad");
-                var gp = navigator.getGamepads()[0];
-                if (gp) {
-                    console.log("Gamepad found");
-                    for (var i = 11; i <= 14; i++) {
-                        switch (i) {
-                            case 11:
-                                GPTransport.ButtonA = (gp.buttons[i].pressed) ? true : false;
-                                break;
-                            case 12:
-                                GPTransport.ButtonB = (gp.buttons[i].pressed) ? true : false;
-                                break;
-                            case 13:
-                                GPTransport.ButtonX = (gp.buttons[i].pressed) ? true : false;
-                                break;
-                            case 14:
-                                GPTransport.ButtonY = (gp.buttons[i].pressed) ? true : false;
-                                break;
-                        }
-                    }
-                    GPTransport.LeftX = gp.axes[1];
-                    GPTransport.LeftY = gp.axes[2];
-                    GPTransport.RightX = gp.axes[3];
-                    GPTransport.RightY = gp.axes[4];
-                    var sGPTransport = JSON.stringify(GPTransport);
-                    var sGPTransportCurrent = JSON.stringify(GPTransportCurrent);
-                    if (broverIsConnected) {
-                        //if (sGPTransport != sGPTransportCurrent) {
-                        console.log("sending GP to server");
-                        GampePadSocket(GPTransport); // send to server
-                        GPTransportCurrent = GPTransport; //save object so we won't send exact same parameters again
-                       // }
-
-                    }
-                }
-            }
-            function GampePadSocket(objGP) {
-                socket.emit('GamePad', JSON.stringify(objGP));
-            }
-            console.log("ready!");
-        });
-        UpdateroverConnectionStatus = function (data) {
-            if (data == "rover is connected") {
-                $('#ledConnectionStatus').attr('class', 'led-green');
-                broverIsConnected = true;
-            }
-            else {
-                $('#ledConnectionStatus').attr('class', 'led-red');
-                broverIsConnected = false;
-            }
-        };
-        resetSliders = function () {
-            document.getElementById("sliderVelocity").value = "0";
-            document.getElementById("sliderSteering").value = "0";
-            document.getElementById("velocity").value = "";
-            document.getElementById("steerVector").value = "";
-        };
-        function canGame() {
-            return "getGamepads" in navigator;
+          }
         }
-
-     </script>
-   </body>
+        function reportOnGamepad() {
+          console.log("In reportOnGamePad");
+          var gp = navigator.getGamepads()[0];
+          if (gp) {
+            console.log("Gamepad found");
+            for (var i = 11; i <= 14; i++) {
+              switch (i) {
+                case 11:
+                  GPTransport.ButtonA = gp.buttons[i].pressed ? true : false;
+                  break;
+                case 12:
+                  GPTransport.ButtonB = gp.buttons[i].pressed ? true : false;
+                  break;
+                case 13:
+                  GPTransport.ButtonX = gp.buttons[i].pressed ? true : false;
+                  break;
+                case 14:
+                  GPTransport.ButtonY = gp.buttons[i].pressed ? true : false;
+                  break;
+              }
+            }
+            GPTransport.LeftX = gp.axes[1];
+            GPTransport.LeftY = gp.axes[2];
+            GPTransport.RightX = gp.axes[3];
+            GPTransport.RightY = gp.axes[4];
+            var sGPTransport = JSON.stringify(GPTransport);
+            var sGPTransportCurrent = JSON.stringify(GPTransportCurrent);
+            if (bRover) {
+              //if (sGPTransport != sGPTransportCurrent) {
+              console.log("sending GP to server");
+              GampePadSocket(GPTransport); // send to server
+              GPTransportCurrent = GPTransport; //save object so we won't send exact same parameters again
+              // }
+            }
+          }
+        }
+        function GampePadSocket(objGP) {
+          socket.emit("GamePad", JSON.stringify(objGP));
+        }
+        console.log("ready!");
+      });
+      UpdateRoverConnectionStatus = function(data) {
+        if (data == "Rover is connected") {
+          $("#ledConnectionStatus").attr("class", "led-green");
+          bRover = true;
+        } else {
+          $("#ledConnectionStatus").attr("class", "led-red");
+          bRover = false;
+        }
+      };
+      resetSliders = function() {
+        document.getElementById("sliderVelocity").value = "0";
+        document.getElementById("sliderSteering").value = "0";
+        document.getElementById("velocity").value = "";
+        document.getElementById("steerVector").value = "";
+      };
+      function canGame() {
+        return "getGamepads" in navigator;
+      }
+    </script>
+  </body>
 </html>
