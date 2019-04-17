@@ -11,7 +11,8 @@ const ch3 = new phidget22.DCMotor();// left front motor controller
 const tp3 = new phidget22.TemperatureSensor(); // left front temperature sensor
 const ch4 = new phidget22.DCMotor();// left rear motor controller
 const tp4 = new phidget22.TemperatureSensor(); // left rear temperature sensor
-
+const dist1 = new phidget22.DistanceSensor();
+const dist2 = new phidget22.DistanceSensor();
 var velocity = 0.00; // current velocity before steering adjustments
 //
 // phidgetServer is the main class to handle events from the phidgets server and from the node server
@@ -28,6 +29,7 @@ exports.phidgetServer = function () {
                 pubsub.publish(global.roverconnection_status, "connected");
                 startMotors();
                 velocity = 0.00;
+                startDistanceSensors();
             }).catch(function (err) {
                 console.log('failed to connect to server:' + err);
             });
@@ -129,6 +131,11 @@ exports.phidgetServer = function () {
         _ch.onDetach = function () {
             console.log(`Motor ${hubPort} detached`);
         }
+        _ch.onVelocityUpdate = function( velocity) {
+
+            var t = new global.objTelemetry("velocity", velocity,"DCMotor", _ch.getHubPort());
+            pubsub.publish(global.telemetry, t);
+        }
         // Handle error on all channels by shutting down the motors
         _ch.onError = function (errorCode, errorDescription){
             console.log(`Error detected: ${errorDescription}`);
@@ -162,6 +169,8 @@ exports.phidgetServer = function () {
 
         _ch.onTemperatureChange = function (temp) {
             console.log('temperature:' + temp + ' (' + this.getTemperature() + ')');
+            var t = new global.objTelemetry("temperature", this.getTemperature(),"temperatureSensor", _ch.getHubPort());
+            pubsub.publish(global.telemetry, t);
         };
 
         _ch.open().then(function (ch) {
@@ -170,6 +179,44 @@ exports.phidgetServer = function () {
             console.log('failed to open the channel:' + err);
         });
 
+    }
+    var startDistanceSensor = function(_ch, hubSerialNumber, hubPort)
+    {
+        _ch.isRemote = true;
+        _ch.setDeviceSerialNumber(hubSerialNumber);
+        _ch.setChannel(0);
+        _ch.setHubPort(hubPort);
+        _ch.onAttach = function (ch) {
+            console.log(ch + ' attached');
+            console.log('Min Distance:' + ch.getMinDistance());
+            console.log('Max Distance:' + ch.getMaxDistance());
+        };
+
+        _ch.onDetach = function (ch) {
+            console.log(ch + ' detached');
+        };
+
+        _ch.onDistanceChange = function (distance) {
+            var sensorLocation = "front"
+            if (! _ch.getHubPort() == distanceFront.hubPort)
+            {
+                sensorLocation = "back";
+            }
+            var t = new global.objTelemetry("distance", this.getDistance(),"distanceSensor", sensorLocation);
+            pubsub.publish(global.telemetry, t);
+        };
+
+        _ch.onSonarReflectionsUpdate = function (distances, amplitudes, count) {
+            console.log('Distance | Amplitude');
+            for (var i = 0; i < count; i++)
+                console.log(distances[i] + '\t | ' + amplitudes[i]);
+        };
+
+        _ch.open().then(function (ch) {
+            console.log('Distance Sensor channel open');
+        }).catch(function (err) {
+            console.log('failed to open the Distance Sensor channel:' + err);
+        });
     }
     var startMotors = function () {
         //start right side motors
@@ -182,6 +229,12 @@ exports.phidgetServer = function () {
         startTemperatureSensor(tp3,motorLeftFront.hubSerialNumber, motorLeftFront.hubPort);
         startMotor(ch4, motorLeftRear.hubSerialNumber, motorLeftRear.hubPort);
         startTemperatureSensor(tp4,motorLeftRear.hubSerialNumber, motorLeftRear.hubPort);
+    }
+    var startDistanceSensors = function () {
+        // start distance sensors
+        startDistanceSensor(dist1, distanceFront.hubSerialNumber, distanceFront.hubPort)
+        startDistanceSensor(dist1, distanceRead.hubSerialNumber, distanceRear.hubPort)
+
     }
     var getVelocity = function () {
         var responseArray = new Array(4);

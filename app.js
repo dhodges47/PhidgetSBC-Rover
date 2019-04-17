@@ -46,6 +46,7 @@ server.on('error', onError);
 server.on('listening', function () {
   console.log('Listening to http://localhost:', port);
 });
+// handlers for socket server for 2 way communication with web page
 const socketServer = function () {
 
     io.on('connection', function (socket) {
@@ -123,6 +124,10 @@ const socketServer = function () {
         var responseArray = data;
         var jsonResponse = JSON.stringify(responseArray);
         socket.emit('errorReport', jsonResponse);
+      });
+      pubsub.subscribe(global.telemetry, function (msg, data) {
+        var jsonTelemetry = JSON.stringify(data);
+        socket.volatile.emit('telemetry', jsonTelemetry);
       });
     });
 

@@ -10,27 +10,25 @@
     <script
       src="https://code.jquery.com/jquery-3.3.1.min.js"
       integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8="
-      crossorigin="anonymous"
-    ></script>
+      crossorigin="anonymous">
+      </script>
     <!-- Bootstrap: Latest compiled and minified CSS -->
     <link
       rel="stylesheet"
       href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
       integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T"
-      crossorigin="anonymous"
-    />
+      crossorigin="anonymous"/>
     <script
       src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"
       integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM"
-      crossorigin="anonymous"
-    ></script>
+      crossorigin="anonymous">
+      </script>
     <!-- Bootstrap Optional theme -->
     <link
       rel="stylesheet"
       href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap-theme.min.css"
       integrity="sha384-rHyoN1iRsVXV4nD0JutlnGaslCJuC7uwjduW9SVrLvRYooPp2bWYgmgJQIXwl/Sp"
-      crossorigin="anonymous"
-    />
+      crossorigin="anonymous"/>
     <!-- mdb (Material Design) bootstrap add-on -->
     <link rel="stylesheet" href="/css/mdb.css" />
     <!--Canvas-guages-->
@@ -61,39 +59,36 @@
               type="button"
               class="btn btn-success"
               id="btnConnect"
-              onclick="btnConnect_onClick();"
-            >
-              Connect to rover</button
-            ><br />
+              onclick="btnConnect_onClick();">
+              Connect to rover</button>
+            <br />
             <button
               type="button"
               class="btn btn-primary"
               id="btnDisConnect"
-              onclick="btnDisConnect_onClick();"
-            >
-              DisConnect rover</button
-            ><br />
+              onclick="btnDisConnect_onClick();">
+              DisConnect rover</button>
+            <br />
             <button
               type="button"
               class="btn btn-warning"
               id="btngetMotorStatus"
-              onclick="btnCancelSteering_onClick();"
-            >
-              Cancel Steering</button
-            ><br />
+              onclick="btnCancelSteering_onClick();">
+              Cancel Steering</button>
+            <br />
             <button
               type="button"
               class="btn btn-danger"
               id="btnstopMotor"
-              onclick="btnStopMotor_onClick();"
-            >
-              Stop rover</button
-            ><br />
+              onclick="btnStopMotor_onClick();">
+              Stop rover</button>
+            <br />
           </div>
         </div>
         <div class="card">
           <div class="card-body">
             <h5 class="card-title">Rover Webcam</h5>
+            <a href="roverCam.html" target="_blank">Click here to open the webcam in a new window</a>
           </div>
         </div>
       </div>
@@ -169,14 +164,14 @@
           <div class="card-body text-center">
             <h5 class="card-title">Distance Sensor: Front</h5>
             <span id="lbDistanceSensorFront"></span>
-            <canvas data-type="linear-gauge"></canvas>
+            <canvas id="distanceGaugeFront" data-type="linear-gauge" data-width="400" data-height="150" data-min-value="0" data-max-value="220" data-major-ticks="0,20,40,60,80,100,120,140,160,180,200,220" data-minor-ticks="2" data-stroke-ticks="true" data-highlights="false" data-color-plate="#fff" data-border-shadow-width="0" data-borders="false" data-bar-begin-circle="false" data-bar-width="10" data-tick-side="left" data-number-side="left" data-needle-side="left" data-needle-type="line" data-needle-width="3" data-color-needle="#222" data-color-needle-end="#222" data-animation-duration="1500" data-animation-rule="linear" data-animation-target="plate" width="400" height="150" style="width: 400px; height: 150px;"></canvas>
           </div>
         </div>
         <div class="card" style="height: 200px; ">
           <div class="card-body text-center">
             <h5 class="card-title">Distance Sensor: Rear</h5>
             <span id="lbDistanceSensorRear"></span>
-            <canvas data-type="linear-gauge"></canvas>
+            <canvas id="distanceGaugeRear" data-type="linear-gauge" data-width="400" data-height="150" data-min-value="0" data-max-value="220" data-major-ticks="0,20,40,60,80,100,120,140,160,180,200,220" data-minor-ticks="2" data-stroke-ticks="true" data-highlights="false" data-color-plate="#fff" data-border-shadow-width="0" data-borders="false" data-bar-begin-circle="false" data-bar-width="10" data-tick-side="left" data-number-side="left" data-needle-side="left" data-needle-type="line" data-needle-width="3" data-color-needle="#222" data-color-needle-end="#222" data-animation-duration="1500" data-animation-rule="linear" data-animation-target="plate" width="400" height="150" style="width: 400px; height: 150px;"></canvas>
           </div>
         </div>
       <br /><br />
@@ -316,11 +311,7 @@
 
          // initialize socket communication with server
         const socket = io("http://localhost:3001");
-
-        socket.on("news", function(data) {
-          console.log(data);
-          socket.emit("my other event", { my: "data" });
-        });
+        // handle various socket messages from the server
         socket.on("connectionStatus", function(data) {
           UpdateRoverConnectionStatus(data);
 
@@ -333,24 +324,62 @@
           $("#lblMotorThreeStatus").text(velocityArray[2]);
           $("#lblMotorFourStatus").text(velocityArray[3]);
           var gauge1 = document.gauges.get('gaugeMotor1');
-      var gauge2 = document.gauges.get('gaugeMotor2');
-      var gauge3 = document.gauges.get('gaugeMotor3');
-      var gauge4 = document.gauges.get('gaugeMotor4');
+          var gauge2 = document.gauges.get('gaugeMotor2');
+          var gauge3 = document.gauges.get('gaugeMotor3');
+          var gauge4 = document.gauges.get('gaugeMotor4');
          gauge1.value = Math.abs(velocityArray[0]*100);
          gauge2.value = Math.abs(velocityArray[1]*100);
          gauge3.value = Math.abs(velocityArray[2]*100);
          gauge4.value = Math.abs(velocityArray[3]*100);
+        });
+        socket.on("telemetry", function(t){
+          var telemetry = JSON.parse(t);
+           if(telemetry.sourceName)
+           {
+            switch (telemetry.sourceName)
+            {
+              case "DCMotor":
+                if (telemetry.event == "velocity")
+                {
+              var v = telemetry.value;
+                }
+                break;
+              case "temperatureSensor":
+               if(telemetry.event=="temperature")
+               {
+                 var celsius = telemetry.value;
+                 var farenheit = (celsius * 9/5) + 32;
+                 var distanceSensor = telemetry.sourceIndex; // will be either "front" or "back"
+                 if (distanceSensor == "front")
+                 {
+                  var gauge1 = document.gauges.get('distanceGaugeFront');
+                  gauge1.value = telemetry.value;
+                 }
+               }
+                break;
+              case "distanceSensor":
+              if (telemetry.event == "distance")
+              {
+              var distanceSensor = telemetry.sourceIndex; // will be either "front" or "back"
+                 if (distanceSensor == "front")
+                 {
+                  var gauge1 = document.gauges.get('distanceGaugeFront');
+                  gauge1.value = telemetry.value;
+                 }
+                 else{
+                  var gauge1 = document.gauges.get('distanceGaugeRear');
+                  gauge1.value = telemetry.value;
+                 }
+                }
+                break;
+              }
+            }
         });
         socket.on("errorReport", function(data) {
           var errorMessage = data;
           $("#lblError").text(errorMessage);
           socket.emit("motorstatus", "");
         });
-        sendMessage = function() {
-          socket.emit("chat message", $("#m").val());
-          $("#m").val("");
-          return false;
-        };
         // button event handlers
         btnConnect_onClick = function() {
           $("#ledConnectionStatus").attr("class", "led-yellow");
