@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<meta charset="UTF-8">
+<html>
+<title>InterfaceKit Example</title>
+<script src="jquery-2.1.4.min.js"></script>
+<script src="sha256.min.js"></script>
+<script src="phidget22.min.js"></script>
+<script>
+$(document).ready(function() {
+    var conn = new phidget22.Connection(8989, 'localhost');
+
+    for(i=0;i<8;i++)
+    {
+        p_di.push(new phidget22.DigitalInput());
+        p_do.push(new phidget22.DigitalOutput());
+        p_vi.push(new phidget22.VoltageInput());
+    }
+
+    for(i=0;i<8;i++)
+    {
+        // To ensure we're opening channels only belonging to a single InterfaceKit, we'll set the serial number for each channel:
+        p_di[i].setDeviceSerialNumber(324781);
+        p_do[i].setDeviceSerialNumber(324781);
+        p_vi[i].setDeviceSerialNumber(324781);
+
+        // We need to set attach handlers for all channels. We could set them all to the same one, or split them up by type like this:
+        p_di[i].onAttach = di_onAttach;
+        p_do[i].onAttach = do_onAttach;
+        p_vi[i].onAttach = vi_onAttach;
+
+        // We need to set error handlers for each channel as well. We'll use the same generic error handler function in this case:
+        p_di[i].onError = onError;
+        p_do[i].onError = onError;
+        p_vi[i].onError = onError;
+
+        // Most importantly, we need to set data handlers for our two input classes:
+        p_di[i].onStateChange = di_stateChange;
+        p_vi[i].onVoltageChange = vi_voltageChange;
+    }
+
+    conn.connect().then(function() {
+        console.log('connected');
+        for(i=0;i<8;i++)
+        {
+            // Once we're connected, try to open all eight of each type of channel:
+            p_di[i].open().catch(function(err) {console.log('Failed to open Digital Input Channel. Err: ' + err);});
+            p_do[i].open().catch(function(err) {console.log('Failed to open Digital Output Channel. Err: ' + err);});
+            p_vi[i].open().catch(function(err) {console.log('Failed to open Voltage Input Channel. Err: ' + err);});
+        }
+
+    }).catch(function(err) {
+        alert('failed to connect to server:' + err);
+    });;
+});
+
+function di_onAttach(ch) {
+console.log(ch + ' attached');
+
+if (ch.getState())
+    $('#di_state_' + ch).prop("checked",true);
+}
+
+function do_onAttach(ch) {
+console.log(ch + ' attached');
+// We'll use the digital outputs to list the device properties (although any channel from this InterfaceKit will do)
+setLabel('attachLabel',p_di[0].getDeviceClassName());
+setLabel('serialLabel',p_di[0].getDeviceSerialNumber());
+setLabel('versionLabel',p_di[0].getDeviceSKU() + ' ver.' + p_di[0].getDeviceVersion());
+}
+
+function vi_onAttach(ch) {
+console.log(ch + ' attached');
+ch.setDataInterval(8);
+ch.setVoltageChangeTrigger(0.01);
+}
+
+function vi_voltageChange(voltage) {
+
+// We can access the sender of this event by using the "this" keyword. This lets us know which channel was triggered.
+var ch = this.channel.index;
+
+$('#vi_voltage_' + ch).val(voltage);
+}
+
+function di_stateChange(state) {
+
+// We can access the sender of this event by using the "this" keyword. This lets us know which channel was triggered.
+var ch = this.channel.index;
+
+if (state)
+    $('#di_state_' + ch).prop("checked",true);
+else
+    $('#di_state_' + ch).prop("checked",false);
+}
+
+function do_stateChange(ch) {
+
+p_do[ch].setState($('#do_state_' + ch)[0].checked);
+}
+
+function onError(arg0, arg1) {
+
+var d = new Date();
+$('#errorTable').append('<tr><td> ' + d.getHours() + ':' + d.getMinutes() + ':' + d.getSeconds() + '.' + d.getMilliseconds() + '</td><td> 0x' + arg0.toString(16) + '</td><td>' + arg1 + '</td>');
+$("#errorField").show();
+}
+
+function setLabel(name, value) {
+
+$('#' + name).text(value);
+}
+
+</script>
+<body>
+<fieldset id="Attach">
+    <table>
+        <tr>
+            <td><label>Attached:</label></td><td colspan='2'><label id='attachLabel'></label></td>
+        </tr>
+        <tr>
+            <td><label>Product:</label></td><td><label id='versionLabel'></label></td>
+        </tr>
+        <tr>
+            <td><label>Serial Number:</label></td><td><label id='serialLabel'></label></td>
+        </tr>
+    </table>
+</fieldset>
+<fieldset id="inputField">
+    <legend><label >Digital Inputs</label></legend>
+    <table>
+        <tr>
+            <td style="text-align:center">0</td>
+            <td style="text-align:center">1</td>
+            <td style="text-align:center">2</td>
+            <td style="text-align:center">3</td>
+            <td style="text-align:center">4</td>
+            <td style="text-align:center">5</td>
+            <td style="text-align:center">6</td>
+            <td style="text-align:center">7</td>
+        </tr>
+        <tr>
+            <td><input type="checkbox" onclick="return false;" readonly id='di_state_0' value="0"></td>
+            <td><input type="checkbox" onclick="return false;" readonly id='di_state_1' value="0"></td>
+            <td><input type="checkbox" onclick="return false;" readonly id='di_state_2' value="0"></td>
+            <td><input type="checkbox" onclick="return false;" readonly id='di_state_3' value="0"></td>
+            <td><input type="checkbox" onclick="return false;" readonly id='di_state_4' value="0"></td>
+            <td><input type="checkbox" onclick="return false;" readonly id='di_state_5' value="0"></td>
+            <td><input type="checkbox" onclick="return false;" readonly id='di_state_6' value="0"></td>
+            <td><input type="checkbox" onclick="return false;" readonly id='di_state_7' value="0"></td>
+        </tr>
+    </table>
+</fieldset>
+<fieldset id="outputField">
+    <legend><label >Digital Outputs</label></legend>
+    <table>
+        <tr>
+            <td style="text-align:center">0</td>
+            <td style="text-align:center">1</td>
+            <td style="text-align:center">2</td>
+            <td style="text-align:center">3</td>
+            <td style="text-align:center">4</td>
+            <td style="text-align:center">5</td>
+            <td style="text-align:center">6</td>
+            <td style="text-align:center">7</td>
+        </tr>
+        <tr>
+            <td><input type="checkbox" onclick="do_stateChange(0)" id='do_state_0' value="0"></td>
+            <td><input type="checkbox" onclick="do_stateChange(1)" id='do_state_1' value="0"></td>
+            <td><input type="checkbox" onclick="do_stateChange(2)" id='do_state_2' value="0"></td>
+            <td><input type="checkbox" onclick="do_stateChange(3)" id='do_state_3' value="0"></td>
+            <td><input type="checkbox" onclick="do_stateChange(4)" id='do_state_4' value="0"></td>
+            <td><input type="checkbox" onclick="do_stateChange(5)" id='do_state_5' value="0"></td>
+            <td><input type="checkbox" onclick="do_stateChange(6)" id='do_state_6' value="0"></td>
+            <td><input type="checkbox" onclick="do_stateChange(7)" id='do_state_7' value="0"></td>
+        </tr>
+    </table>
+</fieldset>
+<fieldset id="voltageField">
+    <legend><label >Voltage Inputs</label></legend>
+    <table>
+        <tr>
+            <td style="text-align:center">0</td>
+            <td style="text-align:center">1</td>
+            <td style="text-align:center">2</td>
+            <td style="text-align:center">3</td>
+            <td style="text-align:center">4</td>
+            <td style="text-align:center">5</td>
+            <td style="text-align:center">6</td>
+            <td style="text-align:center">7</td>
+        </tr>
+        <tr>
+            <td><input readonly type='text' size="7" id='vi_voltage_0' value="0"></td>
+            <td><input readonly type='text' size="7" id='vi_voltage_1' value="0"></td>
+            <td><input readonly type='text' size="7" id='vi_voltage_2' value="0"></td>
+            <td><input readonly type='text' size="7" id='vi_voltage_3' value="0"></td>
+            <td><input readonly type='text' size="7" id='vi_voltage_4' value="0"></td>
+            <td><input readonly type='text' size="7" id='vi_voltage_5' value="0"></td>
+            <td><input readonly type='text' size="7" id='vi_voltage_6' value="0"></td>
+            <td><input readonly type='text' size="7" id='vi_voltage_7' value="0"></td>
+        </tr>
+    </table>
+</fieldset>
+<fieldset id="errorField" hidden>
+    <legend>Errors</legend>
+    <table id="errorTable">
+        <col width="100"><col width="100"><col width="400">
+        <thead><tr>
+            <th align='left'>Time</th>
+            <th align='center'>Error #</th>
+            <th align='center'>Desc</th>
+            <th><input type='submit' size='9' onclick="$('#errorTable tbody').remove();" value='Clear'></th>
+        </tr></thead>
+    </table>
+</fieldset>
+</body>
+</html>

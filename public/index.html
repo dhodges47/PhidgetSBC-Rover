@@ -6,33 +6,15 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <link rel="stylesheet" media="screen" href="/css/site.css" />
-    <script src="/js/socket.io.js"></script>
-    <script
-      src="https://code.jquery.com/jquery-3.3.1.min.js"
-      integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8="
-      crossorigin="anonymous">
-      </script>
-    <!-- Bootstrap: Latest compiled and minified CSS -->
+    <!-- Font Awesome -->
     <link
       rel="stylesheet"
-      href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
-      integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T"
-      crossorigin="anonymous"/>
-    <script
-      src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"
-      integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM"
-      crossorigin="anonymous">
-      </script>
-    <!-- Bootstrap Optional theme -->
-    <link
-      rel="stylesheet"
-      href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap-theme.min.css"
-      integrity="sha384-rHyoN1iRsVXV4nD0JutlnGaslCJuC7uwjduW9SVrLvRYooPp2bWYgmgJQIXwl/Sp"
-      crossorigin="anonymous"/>
-    <!-- mdb (Material Design) bootstrap add-on -->
-    <link rel="stylesheet" href="/css/mdb.css" />
-    <!--Canvas-guages-->
-    <script src="/js/gauge.min.js"></script>
+      href="https://use.fontawesome.com/releases/v5.7.0/css/all.css"
+    />
+    <!-- Bootstrap core CSS -->
+    <link href="css/bootstrap.min.css" rel="stylesheet" />
+    <!-- Material Design Bootstrap -->
+    <link href="css/mdb.min.css" rel="stylesheet" />
   </head>
   <body class="grey lighten-3">
     <div class="container">
@@ -59,36 +41,46 @@
               type="button"
               class="btn btn-success"
               id="btnConnect"
-              onclick="btnConnect_onClick();">
-              Connect to rover</button>
+              onclick="btnConnect_onClick();"
+            >
+              Connect to rover
+            </button>
             <br />
             <button
               type="button"
               class="btn btn-primary"
               id="btnDisConnect"
-              onclick="btnDisConnect_onClick();">
-              DisConnect rover</button>
+              onclick="btnDisConnect_onClick();"
+            >
+              DisConnect rover
+            </button>
             <br />
             <button
               type="button"
               class="btn btn-warning"
               id="btngetMotorStatus"
-              onclick="btnCancelSteering_onClick();">
-              Cancel Steering</button>
+              onclick="btnCancelSteering_onClick();"
+            >
+              Cancel Steering
+            </button>
             <br />
             <button
               type="button"
               class="btn btn-danger"
               id="btnstopMotor"
-              onclick="btnStopMotor_onClick();">
-              Stop rover</button>
+              onclick="btnStopMotor_onClick();"
+            >
+              Stop rover
+            </button>
             <br />
           </div>
         </div>
         <div class="card">
           <div class="card-body">
             <h5 class="card-title">Rover Webcam</h5>
-            <a href="roverCam.html" target="_blank">Click here to open the webcam in a new window</a>
+            <a href="roverCam.html" target="_blank"
+              >Click here to open the webcam in a new window</a
+            >
           </div>
         </div>
       </div>
@@ -99,7 +91,7 @@
             <h5 class="card-title">Motor One (right front)</h5>
             <span id="lblMotorOneStatus"></span>
             <canvas
-            id="gaugeMotor1"
+              id="gaugeMotor1"
               data-type="radial-gauge"
               data-value="0"
               data-width="150"
@@ -116,7 +108,7 @@
 
             <span id="lblMotorTwoStatus"></span>
             <canvas
-            id="gaugeMotor2"
+              id="gaugeMotor2"
               data-type="radial-gauge"
               data-value="0"
               data-width="150"
@@ -132,7 +124,7 @@
             <h5 class="card-title">Motor Three (left front)</h5>
             <span id="lblMotorThreeStatus"></span>
             <canvas
-            id="gaugeMotor3"
+              id="gaugeMotor3"
               data-type="radial-gauge"
               data-value="0"
               data-width="150"
@@ -148,7 +140,7 @@
             <h5 class="card-title">Motor Four(left rear)</h5>
             <span id="lblMotorFourStatus"></span>
             <canvas
-            id="gaugeMotor4"
+              id="gaugeMotor4"
               data-type="radial-gauge"
               data-value="0"
               data-width="150"
@@ -160,20 +152,7 @@
           </div>
         </div>
       </div>
-        <div class="card" style="height: 200px; ">
-          <div class="card-body text-center">
-            <h5 class="card-title">Distance Sensor: Front</h5>
-            <span id="lbDistanceSensorFront"></span>
-            <canvas id="distanceGaugeFront" data-type="linear-gauge" data-width="400" data-height="150" data-min-value="0" data-max-value="220" data-major-ticks="0,20,40,60,80,100,120,140,160,180,200,220" data-minor-ticks="2" data-stroke-ticks="true" data-highlights="false" data-color-plate="#fff" data-border-shadow-width="0" data-borders="false" data-bar-begin-circle="false" data-bar-width="10" data-tick-side="left" data-number-side="left" data-needle-side="left" data-needle-type="line" data-needle-width="3" data-color-needle="#222" data-color-needle-end="#222" data-animation-duration="1500" data-animation-rule="linear" data-animation-target="plate" width="400" height="150" style="width: 400px; height: 150px;"></canvas>
-          </div>
-        </div>
-        <div class="card" style="height: 200px; ">
-          <div class="card-body text-center">
-            <h5 class="card-title">Distance Sensor: Rear</h5>
-            <span id="lbDistanceSensorRear"></span>
-            <canvas id="distanceGaugeRear" data-type="linear-gauge" data-width="400" data-height="150" data-min-value="0" data-max-value="220" data-major-ticks="0,20,40,60,80,100,120,140,160,180,200,220" data-minor-ticks="2" data-stroke-ticks="true" data-highlights="false" data-color-plate="#fff" data-border-shadow-width="0" data-borders="false" data-bar-begin-circle="false" data-bar-width="10" data-tick-side="left" data-number-side="left" data-needle-side="left" data-needle-type="line" data-needle-width="3" data-color-needle="#222" data-color-needle-end="#222" data-animation-duration="1500" data-animation-rule="linear" data-animation-target="plate" width="400" height="150" style="width: 400px; height: 150px;"></canvas>
-          </div>
-        </div>
+
       <br /><br />
       <form id="form1" oninput="velocity.value = sliderVelocity.valueAsNumber">
         <div class="card">
@@ -287,6 +266,19 @@
         </div>
       </div>
     </div>
+    <!-- SCRIPTS -->
+    <!-- JQuery -->
+    <script type="text/javascript" src="js/jquery-3.3.1.min.js"></script>
+    <!-- Bootstrap tooltips -->
+    <script type="text/javascript" src="js/popper.min.js"></script>
+    <!-- Bootstrap core JavaScript -->
+    <script type="text/javascript" src="js/bootstrap.min.js"></script>
+    <!-- MDB core JavaScript -->
+    <script type="text/javascript" src="js/mdb.min.js"></script>
+    <!--Canvas-guages-->
+    <script src="/js/gauge.min.js"></script>
+    <!--sociket.io-->
+    <script src="/js/socket.io.js"></script>
     <script>
       var hasGP = false; // has Gampepad
       var repGP; // timer for Gamepad
@@ -308,8 +300,11 @@
       var GPTransportCurrent = {}; // current parameters that have already been sent to the robot
 
       $(function() {
-
-         // initialize socket communication with server
+          var gauge1 = document.gauges.get("gaugeMotor1");
+          var gauge2 = document.gauges.get("gaugeMotor2");
+          var gauge3 = document.gauges.get("gaugeMotor3");
+          var gauge4 = document.gauges.get("gaugeMotor4");
+        // initialize socket communication with server
         const socket = io("http://localhost:3001");
         // handle various socket messages from the server
         socket.on("connectionStatus", function(data) {
@@ -323,62 +318,63 @@
           $("#lblMotorTwoStatus").text(velocityArray[1]);
           $("#lblMotorThreeStatus").text(velocityArray[2]);
           $("#lblMotorFourStatus").text(velocityArray[3]);
-          var gauge1 = document.gauges.get('gaugeMotor1');
-          var gauge2 = document.gauges.get('gaugeMotor2');
-          var gauge3 = document.gauges.get('gaugeMotor3');
-          var gauge4 = document.gauges.get('gaugeMotor4');
-         gauge1.value = Math.abs(velocityArray[0]*100);
-         gauge2.value = Math.abs(velocityArray[1]*100);
-         gauge3.value = Math.abs(velocityArray[2]*100);
-         gauge4.value = Math.abs(velocityArray[3]*100);
+
+         // gauge1.value = Math.abs(velocityArray[0] * 100);
+         // gauge2.value = Math.abs(velocityArray[1] * 100);
+         // gauge3.value = Math.abs(velocityArray[2] * 100);
+         // gauge4.value = Math.abs(velocityArray[3] * 100);
         });
-        socket.on("telemetry", function(t){
+        socket.on("telemetry", function(t) {
           var telemetry = JSON.parse(t);
-           if(telemetry.sourceName)
-           {
-            switch (telemetry.sourceName)
-            {
+          if (telemetry.sourceName) {
+            switch (telemetry.sourceName) {
               case "DCMotor":
-                if (telemetry.event == "velocity")
-                {
-              var v = telemetry.value;
+                if (telemetry.event == "velocity") {
+                  var v = telemetry.value;
+                  var e = telemetry.event;
+                  var hubPort = telemetry.sourceIndex;
+                  switch (hubPort)
+                  {
+                    case 0:
+                    gauge1.value = Math.abs(v * 100);
+                    break;
+                    case 1:
+                    gauge2.value = Math.abs(v * 100);
+                    break;
+                    case 2:
+                    gauge3.value = Math.abs(v * 100);
+                    break;
+                    case 3:
+                    gauge4.value = Math.abs(v * 100);
+                    break;
+                  }
                 }
                 break;
               case "temperatureSensor":
-               if(telemetry.event=="temperature")
-               {
-                 var celsius = telemetry.value;
-                 var farenheit = (celsius * 9/5) + 32;
-                 var distanceSensor = telemetry.sourceIndex; // will be either "front" or "back"
-                 if (distanceSensor == "front")
-                 {
-                  var gauge1 = document.gauges.get('distanceGaugeFront');
-                  gauge1.value = telemetry.value;
-                 }
-               }
-                break;
-              case "distanceSensor":
-              if (telemetry.event == "distance")
-              {
-              var distanceSensor = telemetry.sourceIndex; // will be either "front" or "back"
-                 if (distanceSensor == "front")
-                 {
-                  var gauge1 = document.gauges.get('distanceGaugeFront');
-                  gauge1.value = telemetry.value;
-                 }
-                 else{
-                  var gauge1 = document.gauges.get('distanceGaugeRear');
-                  gauge1.value = telemetry.value;
-                 }
+                if (telemetry.event == "temperature") {
+                  var celsius = telemetry.value;
+                  var farenheit = (celsius * 9) / 5 + 32;
+                  // TO DO decide how to display temperature, especially when it is high
                 }
                 break;
-              }
+              case "distanceSensor":
+                if (telemetry.event == "distance") {
+                  var distanceSensor = telemetry.sourceIndex; // will be either "front" or "back"
+                  if (distanceSensor == "front") {
+                    //var gauge1 = document.gauges.get("distanceGaugeFront");
+                    //gauge1.value = telemetry.value;
+                  } else {
+                    //var gauge1 = document.gauges.get("distanceGaugeRear");
+                    //gauge1.value = telemetry.value;
+                  }
+                }
+                break;
             }
+          }
         });
         socket.on("errorReport", function(data) {
           var errorMessage = data;
           $("#lblError").text(errorMessage);
-          socket.emit("motorstatus", "");
         });
         // button event handlers
         btnConnect_onClick = function() {
@@ -393,9 +389,6 @@
           socket.emit("connectRover", { setting: "false" });
           resetSliders();
           return false;
-        };
-        btnGetMotorStatus_onClick = function() {
-          socket.emit("motorstatus", "");
         };
         btnStopMotor_onClick = function() {
           socket.emit("steering", "0");
@@ -420,9 +413,6 @@
             newVelocity = 0;
           }
           socket.emit("velocity", newVelocity);
-          setTimeout(() => {
-            socket.emit("motorstatus", "");
-          }, 250);
         });
         $("#sliderSteering").on("input", function() {
           var newSteering = $(this).val();
@@ -432,9 +422,6 @@
             document.getElementById("sliderSteering").value = "0";
           }
           socket.emit("steering", newSteering);
-          setTimeout(() => {
-            socket.emit("motorstatus", "");
-          }, 250);
         });
 
         //
@@ -459,16 +446,6 @@
               window.clearInterval(repGP);
               GPTransportCurrent = {};
             });
-
-            //setup an interval for Chrome
-            /* var checkGP = window.setInterval(function () {
-                         console.log('checkGP');
-                         if (navigator.getGamepads()[0]) {
-                             if (!hasGP) $(window).trigger("gamepadconnected");
-                             window.clearInterval(checkGP);
-                         }
-                     }, 500);
-                     */
           }
         }
         function reportOnGamepad() {
@@ -511,7 +488,9 @@
           socket.emit("GamePad", JSON.stringify(objGP));
         }
         console.log("ready!");
-      });
+
+      }); // end of document.ready section
+
       UpdateRoverConnectionStatus = function(data) {
         if (data == "Rover is connected") {
           $("#ledConnectionStatus").attr("class", "led-green");

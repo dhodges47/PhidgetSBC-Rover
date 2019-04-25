@@ -21,7 +21,7 @@ app.use(logger('dev'));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
-app.use(express.static(path.join(__dirname, 'public')));
+app.use(express.static(path.join(__dirname, '/public/')));
 
 app.use('/', indexRouter);
 app.use('/users', usersRouter);
@@ -75,10 +75,6 @@ const socketServer = function () {
         var v = math.round(data, 2);
         pubsub.publish(global.roversteering_command, v);
       });
-      socket.on('motorstatus', function (data) {
-        console.log('motorstatus request received');
-        pubsub.publish(global.rovervelocity_statusrequest, 'data');
-      });
       socket.on('GamePad', function (data) {
         // Parse the transport object and push the right pubsub
         console.log("Got a GampePad socket request");
@@ -114,11 +110,6 @@ const socketServer = function () {
         else if (data == "disconnected") {
           socket.emit('connectionStatus', 'Rover is not connected');
         }
-      });
-      pubsub.subscribe(global.rovervelocity_statusreport, function (msg, data) {
-        var responseArray = data;
-        var jsonResponse = JSON.stringify(responseArray);
-        socket.emit('velocityReport', jsonResponse);
       });
       pubsub.subscribe(global.errorreport, function (msg, data) {
         var responseArray = data;

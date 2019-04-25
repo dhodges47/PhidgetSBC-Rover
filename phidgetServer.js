@@ -60,9 +60,6 @@ exports.phidgetServer = function () {
             }
         }
     });
-    pubsub.subscribe(global.rovervelocity_statusrequest, function (msg, data) {
-        getVelocity();
-    });
     pubsub.subscribe(global.roversteering_command, function (msg, data) {
         console.log(data);
         var newVector = math.number(data);
@@ -235,29 +232,6 @@ exports.phidgetServer = function () {
         startDistanceSensor(dist1, distanceFront.hubSerialNumber, distanceFront.hubPort)
         startDistanceSensor(dist1, distanceRead.hubSerialNumber, distanceRear.hubPort)
 
-    }
-    var getVelocity = function () {
-        var responseArray = new Array(4);
-        if (conn.connected) {
-            if (ch1.getAttached()) {
-                _velocity = ch1.getTargetVelocity();
-                responseArray[0] = _velocity;
-
-            }
-            if (ch2.getAttached()) {
-                _velocity = ch2.getTargetVelocity();
-                responseArray[1] = _velocity;
-            }
-            if (ch3.getAttached()) {
-                _velocity = ch3.getTargetVelocity();
-                responseArray[2] = _velocity;
-            }
-            if (ch4.getAttached()) {
-                _velocity = ch4.getTargetVelocity();
-                responseArray[3] = _velocity;
-            }
-        }
-        pubsub.publish(global.rovervelocity_statusreport, responseArray);
     }
     var stopAllMotors = function () {
         velocity = 0;
