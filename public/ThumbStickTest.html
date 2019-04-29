@@ -1,13 +1,19 @@
 <!DOCTYPE html>
 <meta charset="UTF-8">
 <html>
+<head>
 <title>InterfaceKit Example</title>
-<script src="jquery-2.1.4.min.js"></script>
-<script src="sha256.min.js"></script>
-<script src="phidget22.min.js"></script>
+<script type="text/javascript" src="js/jquery-3.3.1.min.js"></script>
+<script src="js/sha256.min.js"></script>
+<script src="js/phidget22.min.js"></script>
 <script>
+
+    // Global arrays for each of our channel types
+var p_di = [];
+var p_do = [];
+var p_vi = [];
 $(document).ready(function() {
-    var conn = new phidget22.Connection(8989, 'localhost');
+  //  var conn = new phidget22.Connection(8989, 'localhost');
 
     for(i=0;i<8;i++)
     {
@@ -19,9 +25,9 @@ $(document).ready(function() {
     for(i=0;i<8;i++)
     {
         // To ensure we're opening channels only belonging to a single InterfaceKit, we'll set the serial number for each channel:
-        p_di[i].setDeviceSerialNumber(324781);
-        p_do[i].setDeviceSerialNumber(324781);
-        p_vi[i].setDeviceSerialNumber(324781);
+        p_di[i].setDeviceSerialNumber(538235);
+        p_do[i].setDeviceSerialNumber(538235);
+        p_vi[i].setDeviceSerialNumber(538235);
 
         // We need to set attach handlers for all channels. We could set them all to the same one, or split them up by type like this:
         p_di[i].onAttach = di_onAttach;
@@ -38,8 +44,8 @@ $(document).ready(function() {
         p_vi[i].onVoltageChange = vi_voltageChange;
     }
 
-    conn.connect().then(function() {
-        console.log('connected');
+   // conn.connect().then(function() {
+    //    console.log('connected');
         for(i=0;i<8;i++)
         {
             // Once we're connected, try to open all eight of each type of channel:
@@ -48,9 +54,8 @@ $(document).ready(function() {
             p_vi[i].open().catch(function(err) {console.log('Failed to open Voltage Input Channel. Err: ' + err);});
         }
 
-    }).catch(function(err) {
-        alert('failed to connect to server:' + err);
-    });;
+
+   // });;
 });
 
 function di_onAttach(ch) {
@@ -111,6 +116,7 @@ $('#' + name).text(value);
 }
 
 </script>
+</head>
 <body>
 <fieldset id="Attach">
     <table>

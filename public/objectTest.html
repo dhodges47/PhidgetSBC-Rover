@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<meta charset="UTF-8" />
+<html>
+  <head>
+    <title>InterfaceKit Example</title>
+    <script type="text/javascript" src="js/jquery-3.3.1.min.js"></script>
+    <script src="js/sha256.min.js"></script>
+    <script src="js/phidget22.min.js"></script>
+    <script src="js/pubsub.js"></script>
+  </head>
+  <body>
+    <script>
+        /*var myObject = function () {
+            x : "X-Axis";
+        };
+        myObject.myFunction = function() {
+            console.log("in myFunction ${this.x}")
+            console.log(this.x);
+            return true
+        }
+
+        myObject.myFunction();
+        */
+        var Container = function(param) {
+
+            function dec() {
+                if (secret > 0) {
+                    secret -= 1;
+                    return true;
+                } else {
+                    return false;
+                }
+            }
+
+            this.member = param;
+            var secret = 3;
+            var that = this;
+
+            this.service = function () {
+                return dec() ? that.member : null;
+            };
+        }
+var myContainer = new Container("avc");
+var y = myContainer.service();
+y = myContainer.service();
+y = myContainer.service();
+y = myContainer.service();
+
+        </script>
+
+        </body>
+        </html>

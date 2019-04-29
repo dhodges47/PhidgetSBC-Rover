@@ -13,10 +13,12 @@ const ch4 = new phidget22.DCMotor();// left rear motor controller
 const tp4 = new phidget22.TemperatureSensor(); // left rear temperature sensor
 const dist1 = new phidget22.DistanceSensor();
 const dist2 = new phidget22.DistanceSensor();
+
 var velocity = 0.00; // current velocity before steering adjustments
 //
 // phidgetServer is the main class to handle events from the phidgets server and from the node server
 exports.phidgetServer = function () {
+
     var conn = new phidget22.Connection(5661, 'phidgetsbc.local');
     //
     // respond to connection commands
@@ -30,6 +32,7 @@ exports.phidgetServer = function () {
                 startMotors();
                 velocity = 0.00;
                 startDistanceSensors();
+
             }).catch(function (err) {
                 console.log('failed to connect to server:' + err);
             });

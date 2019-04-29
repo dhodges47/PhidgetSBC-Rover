@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<meta charset="UTF-8">
+<html>
+<title>VoltageRatioInput Example</title>
+<script type="text/javascript" src="js/jquery-3.3.1.min.js"></script>
+<script src="js/sha256.min.js"></script>
+<script src="js/phidget22.js"></script>
+</html>
+<script>
+
+var phid;
+
+$(document).ready(function () {
+    var conn = new phidget22.Connection(8989, 'localhost');
+    var ch = new phidget22.VoltageRatioInput()
+
+
+	ch.onError = onError;
+	ch.onPropertyChange = propChange;
+	ch.onAttach = onAttach;
+
+	// If you want to open an input on a specific device, set the serial number:
+	ch.setDeviceSerialNumber(538235);
+
+    // If you want to use the VoltageRatioInput mode of a port on your VINT hub, use these:
+	ch.setIsHubPortDevice(false);
+    ch.setHubPort(0);
+    ch.setChannel(0);
+
+
+	ch.onDetach = function(ch) {
+		$('#ratioField').hide();
+		$('#errorField').hide();
+		$('#Attach').hide();
+		$('#noAttach').show();
+	}
+
+	conn.connect().then(function () {
+		console.log('connected');
+		ch.open(5000).then(function (ch) {
+			console.log('channel open');
+		}).catch(function (err) {
+			console.log('failed to open the channel:' + err);
+        });
+    });
+
+
+
+    });
+function onAttach(ch) {
+	console.log(ch + ' attached');
+	phid = ch;
+	setLabel('attachLabel',ch.getDeviceClassName() + ' - ' + ch.getChannelClassName() + ' (Channel ' + ch.getChannel() + ')');
+	setLabel('serialLabel',ch.getDeviceSerialNumber());
+	setLabel('versionLabel',ch.getDeviceSKU() + ' ver.' + ch.getDeviceVersion());
+
+	if(ch.getDeviceClass() == phidget22.DeviceClass.VINT)
+		setLabel('hubPortLabel',ch.getHubPort());
+	else
+		setLabel('hubPortLabel','N/A');
+
+	phid.onVoltageRatioChange = ratioChange;
+	phid.onSensorChange = svChange;
+	phid.onError = onError;
+	phid.onPropertyChange = propChange;
+
+	$('#di').val(phid.getDataInterval());
+	$('#ct').val(phid.getVoltageRatioChangeTrigger());
+
+	switch(phid.getDeviceID()){
+	    case phidget22.DeviceID.PN_1046:
+			phid.setBridgeGain($('#gainCombo').val());
+			$('#sensorLabel').hide();
+			$('#sensorCombo').hide();
+			$('#sensorValue').hide();
+			$('#unit').hide();
+			$("#gainCombo option[value='2']").remove();
+			$("#gainCombo option[value='3']").remove();
+			break;
+	    case phidget22.DeviceID.PN_DAQ1500:
+	        $('#gainCombo').val(phid.getBridgeGain());
+			$('#enableLabel').hide();
+			$('#enableBox').hide();
+			$('#sensorLabel').hide();
+			$('#sensorCombo').hide();
+			$('#sensorValue').hide();
+			$('#unit').hide();
+			$("#gainCombo option[value='3']").remove();
+			$("#gainCombo option[value='4']").remove();
+			$("#gainCombo option[value='5']").remove();
+			$("#gainCombo option[value='6']").remove();
+			break;
+	    case phidget22.DeviceID.PN_1065:
+        case phidget22.DeviceID.VOLTAGE_RATIO_INPUT_PORT:
+	    case phidget22.DeviceID.PN_1010_1013_1018_1019:
+	    case phidget22.DeviceID.PN_1011:
+	    case phidget22.DeviceID.PN_1202_1203:
+	    case phidget22.DeviceID.PN_DAQ1000:
+			$('#gainCombo').hide();
+			$('#gainLabel').hide();
+			$('#enableLabel').hide();
+			$('#enableBox').hide();
+			break;
+	}
+
+	$('#ratioField').show();
+	$('#noAttach').hide();
+	$('#Attach').show();
+}
+
+function propChange(prop) {
+
+    if (prop === 'DataInterval')
+        $('#di').val(this.getDataInterval());
+
+    if (prop === 'VoltageRatioChangeTrigger')
+        $('#ct').val(this.getVoltageRatioChangeTrigger());
+
+    if (prop === 'BridgeEnabled')
+        $('#enableBox').prop("checked",this.getBridgeEnabled());
+
+    if (prop === 'BridgeGain')
+        $('#gainCombo').val(this.getBridgeGain());
+
+    if (prop === 'SensorType')
+        $('#sensorCombo').val(this.getSensorType());
+}
+
+function ratioChange(ratio) {
+
+	$('#VoltageRatio').val(ratio);
+}
+
+function svChange(sensorValue, sensorUnit) {
+
+    $('#sensorValue').val(sensorValue);
+    $('#unit').text(sensorUnit.symbol);
+}
+
+function sensorChange() {
+
+    phid.setSensorType($('#sensorCombo').val());
+}
+
+function enableChange() {
+
+	phid.setBridgeEnabled($('#enableBox')[0].checked);
+}
+
+function gainChange() {
+
+	phid.setBridgeGain($('#gainCombo').val());
+}
+
+function onError(arg0, arg1) {
+
+    var d = new Date();
+    $('#errorTable').append('<tr><td> ' + d.getHours() + ':' + d.getMinutes() + ':' + d.getSeconds() + '.' + d.getMilliseconds() + '</td><td> 0x' + arg0.toString(16) + '</td><td>' + arg1 + '</td>');
+    $("#errorField").show();
+}
+
+function setDI() {
+
+	var di = parseInt($('#di').val());
+	if (di === NaN)
+		return (false);
+
+	if (di < phid.getMinDataInterval()) {
+		di = phid.getMinDataInterval();
+		$('#di').val(di);
+	}
+
+	if (di > phid.getMaxDataInterval()) {
+		di = phid.getMaxDataInterval();
+		$('#di').val(di);
+	}
+
+	phid.setDataInterval(di);
+	return (false);
+}
+
+function setCT() {
+
+	var ct = parseFloat($('#ct').val());
+	if (ct === NaN)
+		return (false);
+
+    if (ct < phid.getMinVoltageRatioChangeTrigger()) {
+        ct = phid.getMinVoltageRatioChangeTrigger();
+        $('#ct').val(ct);
+    }
+
+    if (ct > phid.getMaxVoltageRatioChangeTrigger()) {
+        ct = phid.getMaxVoltageRatioChangeTrigger()-0.1;
+        $('#ct').val(ct);
+    }
+
+
+	phid.setVoltageRatioChangeTrigger(ct);
+	return (false);
+}
+
+function setLabel(name, value) {
+
+    $('#' + name).text(value);
+}
+
+</script>
+<body>
+    <fieldset id="noAttach">
+            <label>No Phidget Attached</label>
+    </fieldset>
+
+    <fieldset id="Attach" hidden>
+        <table>
+            <tr>
+                <td><label>Attached:</label></td><td colspan='2'><label id='attachLabel'></label></td>
+            </tr>
+            <tr>
+                <td><label>Product:</label></td><td><label id='versionLabel'></label></td>
+            </tr>
+            <tr>
+                <td><label>Serial Number:</label></td><td><label id='serialLabel'></label></td>
+            </tr>
+            <tr>
+                <td><label>Hub Port:</label></td><td><label id='hubPortLabel'></label></td>
+            </tr>
+        </table>
+    </fieldset>
+    <fieldset id="ratioField" hidden>
+        <fieldset>
+            <legend><label >Settings</label></legend>
+            <table>
+                <tr>
+                    <td><label >Data Interval</label></td>
+                    <td><input type='text'  id='di' size='7' value='30'></input></td>
+                    <td><input type='submit' size='9'  id='diButton' onclick='setDI()' value='Set'></input></td>
+                </tr>
+                <tr>
+                    <td><label >Change Trigger</label></td>
+                    <td><input type='text'  id='ct' size='7' value='0.0'></input></td>
+                    <td><input type='submit' size='9'  onclick='setCT()' value='Set'></input></td>
+                </tr>
+                <tr>
+                    <td><label id='gainLabel' >Bridge Gain</label></td>
+                    <td><select  onChange='gainChange()' id='gainCombo'>
+                    <option value="1">1x</option>
+                    <option value="2">2x</option>
+                    <option value="3">4x</option>
+                    <option value="4">8x</option>
+                    <option value="5">16x</option>
+                    <option value="6">32x</option>
+                    <option value="7">64x</option>
+                    <option value="8">128x</option>
+                    </select></td>
+                </tr>
+                <tr>
+                    <td><label id='enableLabel' >Enabled</label></td>
+                    <td><input type="checkbox" id='enableBox' onChange="enableChange()" value="0"></input></td>
+                </tr>
+            </table>
+        </fieldset>
+
+        <fieldset>
+            <legend><label >Data</label></legend>
+            <table>
+                <tr>
+                    <td><label>VoltageRatio</label></td>
+                </tr>
+                <tr>
+                    <td><input readonly type='text' id='VoltageRatio' value="0"></td>
+                </tr>
+                <tr>
+                    <td><label  id='sensorLabel'>Sensor Type:</label>
+                    <select  onChange='sensorChange()' id='sensorCombo'>
+                    <option value="0">  Voltage Ratio </option>
+                    <option value="11011"> 1101 - IR Distance (4-30cm) </option>
+                    <option value="11012"> 1101 - IR Distance (10-80cm) </option>
+                    <option value="11013"> 1101 - IR Distance (20-150cm) </option>
+                    <option value="11020"> 1102 - IR Reflective Sensor 5mm </option>
+                    <option value="11030"> 1103 - IR Reflective Sensor 10cm </option>
+                    <option value="11040"> 1104 - Vibration Sensor </option>
+                    <option value="11050"> 1105 - Light Sensor </option>
+                    <option value="11060"> 1106 - Force Sensor </option>
+                    <option value="11070"> 1107 - Humidity Sensor </option>
+                    <option value="11080"> 1108 - Magnetic Sensor </option>
+                    <option value="11090"> 1109 - Rotation Sensor </option>
+                    <option value="11100"> 1110 - Touch Sensor </option>
+                    <option value="11110"> 1111 - Motion Sensor </option>
+                    <option value="11120"> 1112 - Slider 60 </option>
+                    <option value="11130"> 1113 - Mini Joy Stick Sensor </option>
+                    <option value="11150"> 1115 - Pressure Sensor </option>
+                    <option value="11160"> 1116 - Multi-turn Rotation Sensor </option>
+                    <option value="11181"> 1118 - 50Amp Current Sensor AC </option>
+                    <option value="11182"> 1118 - 50Amp Current Sensor DC </option>
+                    <option value="11191"> 1119 - 20Amp Current Sensor AC </option>
+                    <option value="11192"> 1119 - 20Amp Current Sensor DC </option>
+                    <option value="11200"> 1120 - FlexiForce Adapter </option>
+                    <option value="11210"> 1121 - Voltage Divider </option>
+                    <option value="11221"> 1122 - 30 Amp Current Sensor AC </option>
+                    <option value="11222"> 1122 - 30 Amp Current Sensor DC </option>
+                    <option value="11240"> 1124 - Precision Temperature Sensor </option>
+                    <option value="11251"> 1125 - Humidity Sensor </option>
+                    <option value="11252"> 1125 - Temperature Sensor </option>
+                    <option value="11260"> 1126 - Diff. Air Pressure Sensor +- 25kPa </option>
+                    <option value="11280"> 1128 - MaxBotix EZ-1 Sonar Sensor </option>
+                    <option value="11290"> 1129 - Touch Sensor </option>
+                    <option value="11310"> 1131 - Thin Force Sensor </option>
+                    <option value="11340"> 1134 - Switchable Voltage Divider </option>
+                    <option value="11360"> 1136 - Diff. Air Pressure Sensor +-2 kPa </option>
+                    <option value="11370"> 1137 - Diff. Air Pressure Sensor +-7 kPa </option>
+                    <option value="11380"> 1138 - Diff. Air Pressure Sensor 50 kPa </option>
+                    <option value="11390"> 1139 - Diff. Air Pressure Sensor 100 kPa </option>
+                    <option value="11400"> 1140 - Abs. Air Pressure Sensor 20-400 kPa </option>
+                    <option value="11410"> 1141 - Abs. Air Pressure Sensor 15-115 kPa </option>
+                    <option value="11460"> 1146 - IR Reflective Sensor 1-4mm </option>
+                    <option value="31200"> 3120 - Compression Load Cell (0-4.5 kg) </option>
+                    <option value="31210"> 3121 - Compression Load Cell (0-11.3 kg) </option>
+                    <option value="31220"> 3122 - Compression Load Cell (0-22.7 kg) </option>
+                    <option value="31230"> 3123 - Compression Load Cell (0-45.3 kg) </option>
+                    <option value="31300"> 3130 - Relative Humidity Sensor </option>
+                    <option value="35200"> 3520 - Sharp Distance Sensor (4-30cm) </option>
+                    <option value="35210"> 3521 - Sharp Distance Sensor (10-80cm) </option>
+                    <option value="35220"> 3522 - Sharp Distance Sensor (20-150cm) </option>
+                    </select></td>
+                </tr>
+                <tr>
+                    <td><input readonly type='text' id='sensorValue' value="0"><label id='unit' >V/V</label></td>
+                </tr>
+            </table>
+        </fieldset>
+    </fieldset>
+    <fieldset id="errorField" hidden>
+        <legend>Errors</legend>
+        <table id="errorTable">
+            <col width="100"><col width="100"><col width="400">
+            <thead><tr>
+                <th align='left'>Time</th>
+                <th align='center'>Error #</th>
+                <th align='center'>Desc</th>
+                <th><input type='submit' size='9' onclick="$('#errorTable tbody').remove();" value='Clear'></th>
+            </tr></thead>
+        </table>
+    </fieldset>
+</body>
+</html>
