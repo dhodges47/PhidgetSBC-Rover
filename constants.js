@@ -1,3 +1,8 @@
+/***********************************************************************
+ * constants.js
+ * by David Hodges, Outermost Software, LLC, 2019
+ * various addresses, constants, and classes common to both app.js and phidgetServer.js
+ ***********************************************************************/
 //
 // network addresses (for reference)
 //

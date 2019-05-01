@@ -1,3 +1,12 @@
+/***********************************************************************
+ * PhidgetsServer Class
+ * by David Hodges, Outermost Software, LLC, 2019
+ * NodeJs controller to communicate with Phidgets rover
+ * Usage in calling script (app.js):
+ * phidget.phidgetServer();
+ * It communicates with app.js asynchronously using the pubsub.js methods
+ *
+ ***********************************************************************/
 const phidget22 = require('phidget22');
 const pubsub = require('pubsub-js');
 const global = require('./constants');
