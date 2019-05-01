@@ -81,7 +81,6 @@ exports.phidgetServer = function () {
         if (conn.connected && ch1.getAttached() && ch2.getAttached() && ch3.getAttached() && ch4.getAttached()) {
             // ch1 and ch2 are the right wheels
             // ch3 and ch4 are the left wheels
-            console.log('NewVector: ' + newVector)
             var leftNewVelocity = 0.00;
             var rightNewVelocity = 0.00;
 
