@@ -11,6 +11,7 @@ const phidget22 = require('phidget22');
 const pubsub = require('pubsub-js');
 const global = require('./constants');
 const math = require('mathjs'); // for accurate math in the steering function
+const diffSteer = require('diff-steer'); // differential steering algorithm
 
 const ch1 = new phidget22.DCMotor();// right front motor controller
 const tp1 = new phidget22.TemperatureSensor(); // right front temperature sensor
@@ -24,6 +25,7 @@ const dist1 = new phidget22.DistanceSensor();
 const dist2 = new phidget22.DistanceSensor();
 
 var velocity = 0.00; // current velocity before steering adjustments
+
 //
 // phidgetServer is the main class to handle events from the phidgets server and from the node server
 exports.phidgetServer = function () {
@@ -57,8 +59,7 @@ exports.phidgetServer = function () {
         pubsub.publish(global.roverconnection_status, "disconnected");
     });
     //
-    // Respond to commands to the motors
-    //
+
     pubsub.subscribe(global.rovervelocity_command, function (msg, data) {
         if (conn.connected && ch1.getAttached() && ch2.getAttached() && ch3.getAttached() && ch4.getAttached()) {
             var newvelocity = math.round(math.divide(data, 100), 2);// save current velocity in global variable for steering reference point
@@ -73,7 +74,7 @@ exports.phidgetServer = function () {
         }
     });
     pubsub.subscribe(global.roversteering_command, function (msg, data) {
-        console.log(data);
+
         var newVector = math.number(data);
         if (newVector != 0) {
             newVector = math.round(math.divide(newVector, 50), 2);
@@ -127,6 +128,26 @@ exports.phidgetServer = function () {
             ch4.setTargetVelocity(leftNewVelocity);
         }
     });
+
+    pubsub.subscribe(global.roverthumbstick_command, function (msg, data) {
+        var TSTransport = data;
+        var x = TSTransport.X;
+        var y = TSTransport.Y;
+        console.log(TSTransport);
+        // experiment with diffsteer package
+        // diffsteer assumes both velocity and steering (X and Y) will be in the range of -1 to 1.
+        diffSteer.flipAxis = -1; // Defaults to -1
+        var testSteer = diffSteer( x, y)
+        var conversionFactor = 1.000/255;
+        var newLeftVelocity = testSteer[0]*conversionFactor;
+        var newRightVelocity = testSteer[1]*conversionFactor;
+        console.log(testSteer);
+        console.log(`New velocities after diffSteer. Left: ${newLeftVelocity}. Right: ${newRightVelocity}.`)
+    });
+        //
+    // Respond to commands to the motors
+    //
+
     var startMotor = function(_ch, hubSerialNumber, hubPort)
     {
         _ch.isRemote = true;
@@ -176,7 +197,7 @@ exports.phidgetServer = function () {
         };
 
         _ch.onTemperatureChange = function (temp) {
-            console.log('temperature:' + temp + ' (' + this.getTemperature() + ')');
+           // console.log('temperature:' + temp + ' (' + this.getTemperature() + ')');
             var t = new global.objTelemetry("temperature", this.getTemperature(),"temperatureSensor", _ch.getHubPort());
             pubsub.publish(global.telemetry, t);
         };
@@ -215,9 +236,9 @@ exports.phidgetServer = function () {
         };
 
         _ch.onSonarReflectionsUpdate = function (distances, amplitudes, count) {
-            console.log('Distance | Amplitude');
-            for (var i = 0; i < count; i++)
-                console.log(distances[i] + '\t | ' + amplitudes[i]);
+            //console.log('Distance | Amplitude');
+           // for (var i = 0; i < count; i++)
+               // console.log(distances[i] + '\t | ' + amplitudes[i]);
         };
 
         _ch.open().then(function (ch) {

@@ -15,6 +15,7 @@ exports.roverconnection_command = "rcc" // send connect/disconnect commands from
 exports.roverconnection_status = "rcs"  // send phidget connection status back to sockets controller to send to web page
 exports.rovervelocity_command = "rvc"   // send velocity commands from web page via sockets to phidget controller
 exports.roversteering_command = "rss"   // send steering command from web page via sockets to phidgets controller
+exports.roverthumbstick_command = "thumbstick"   // thumbstick combined velocity/steering command
 exports.errorreport = "errorrpt"    // report an error from the phidget controller to send to web page
 exports.telemetry = "telemetry"  // for sensor and controller value reporting. Telemetry data is sent to the web page using "volatile", meaming they can be droped if the client is too busy
 

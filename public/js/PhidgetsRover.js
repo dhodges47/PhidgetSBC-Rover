@@ -133,15 +133,18 @@ $(function() {
 //
   // handlers for ThumbStick
   //
-  function onThumbStickx(msg, XPos)
+  function onThumbStick(msg, _TSTransport)
     {
-        TSTransport.X = XPos;
+      // thumbstick values contain both velocity and steering (X and Y)
+      // check to see if thumbstick values have changed
+      // and if so, send them to the server.
+      if (! compareThumbStickValues(_TSTransport.X, _TSTransport.Y))
+      {
+        TSTransport.X = _TSTransport.X;
+        TSTransport.Y = _TSTransport.Y;
         ThumbStickSocket(JSON.stringify(TSTransport)); // send to server
-    }
-    function onThumbSticky(msg, YPos)
-    {
-        TSTransport.Y = YPos;
-        ThumbStickSocket(JSON.stringify(TSTransport)); // send to server
+      }
+
     }
     function onThumbStickButton(msg, state)
     {
@@ -150,24 +153,24 @@ $(function() {
     function ThumbStickSocket(objGP) {
         socket.emit("ThumbStick", objGP);
       }
-var token1;
-var token2;
-var token3;
-startThumbStick = function () {
-    //
-    // subscribe to events from the ThumbStick
-    //
-   token1 = PubSub.subscribe("thumbstick-x", onThumbStickx)
-   token2 =  PubSub.subscribe("thumbstick-y", onThumbSticky)
-   token3 =  PubSub.subscribe("thumbstick-digitalInput", onThumbStickButton)
-}
+    var token1;
+    var token2;
+    startThumbStick = function() {
+      //
+      // subscribe to events from the ThumbStick
+      //
+      token1 = PubSub.subscribe("thumbstick", onThumbStick);
+      token2 = PubSub.subscribe(
+        "thumbstick-digitalInput",
+        onThumbStickButton
+      );
+    };
 stopThumbStick = function () {
     //
     // un-subscribe to events from the ThumbStick
     //
-   PubSub.unsubscribe(token1);
+    PubSub.unsubscribe(token1);
     PubSub.unsubscribe(token2);
-    PubSub.unsubscribe(token3);
 }
 UpdateRoverConnectionStatus = function(data) {
   if (data == "Rover is connected") {
@@ -184,3 +187,12 @@ resetSliders = function() {
   document.getElementById("velocity").value = "";
   document.getElementById("steerVector").value = "";
 };
+var compareThumbStickValues = function(X, Y)
+{
+  //console.log(`X: ${X} Y: ${Y} TSTTransport: ${TSTransport.X}, ${TSTransport.Y}`);
+  if (TSTransport.X === X && TSTransport.Y === Y)
+  {
+    return true;
+  }
+  return false;
+ }

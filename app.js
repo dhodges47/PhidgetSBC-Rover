@@ -56,10 +56,6 @@ server.on('listening', function () {
 });
 // handlers for socket server for 2 way communication with web page
 const socketServer = function () {
-  // object to hold previous values from ThumbStick
-    let TSTransportSave = {};
-    TSTransportSave.X = 0;
-    TSTransportSave.Y = 0;
     //
     // socket server events
     //
@@ -93,40 +89,14 @@ const socketServer = function () {
         pubsub.publish(global.roversteering_command, v);
       });
       socket.on('ThumbStick', function (data) {
-         // this event comes from the ThumbStick phidget
-          // Parse the transport object and push the right pubsub
           var TSTransport = JSON.parse(data);
-          console.log(`Got a ThumbStick socket request. X: ${TSTransport.X} Y: ${TSTransport.Y}`);
-          if (compareThumbStickValues(TSTransport.X, TSTransport.Y))
-          {
-            return; // same values as last time.
-          }
-          else {
-            TSTransportSave.X = TSTransport.X;
-            TSTransportSave.Y = TSTransport.Y;
-          }
           if (TSTransport.X == 0) {
             //this tells the rover to stop.
             pubsub.publish(global.rovervelocity_command, 0);
             return;
           }
-          var velocity = math.round(math.number(- TSTransport.X) * 100, 2);//multiply incoming velocity by 100 to match values from the slider
-          //console.log("Publishing ThumbStick Velocity: " + TSTransport.Y)
-          pubsub.publish(global.rovervelocity_command, velocity);
-          if (math.number(TSTransport.Y) == 0) {
-            //console.log("Publishing GampePad Steering: 0")
-            pubsub.publish(global.roversteering_command, 0);
-          }
-          else {
-            var AxisX = math.number(TSTransport.X) * 50; // because the phidgetServer steering routine divides by 50
-            var AxisY = math.number(TSTransport.Y) * 50;
-            var steeringVectorLength = Math.sqrt(Math.pow(AxisX, 2) + Math.pow(AxisY, 2));
-            steeringVectorLength = math.round(steeringVectorLength, 2);
-            if (!isNaN(steeringVectorLength) && (math.number(TSTransport.Y) > 0.10 || math.number(TSTransport.Y) < 0.10)) {
-             // console.log("Publishing ThumbStick steering vector: " + steeringVectorLength)
-             pubsub.publish(global.roversteering_command, steeringVectorLength);
-            }
-          }
+          console.log(`Got a ThumbStick socket request. X: ${TSTransport.X} Y: ${TSTransport.Y}`);
+         pubsub.publish(global.roverthumbstick_command, TSTransport);
       });
       pubsub.subscribe(global.roverconnection_status, function (msg, data) {
         if (data == "connected") {
@@ -146,6 +116,7 @@ const socketServer = function () {
         socket.volatile.emit('telemetry', jsonTelemetry);
       });
     });
+
     var compareThumbStickValues = function(X, Y)
     {
       if (TSTransportSave.X == X && TSTransportSave.Y == Y)
