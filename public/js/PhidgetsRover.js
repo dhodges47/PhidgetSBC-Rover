@@ -27,8 +27,6 @@ $(function() {
   // handle various socket messages from the server
   socket.on("connectionStatus", function(data) {
     UpdateRoverConnectionStatus(data);
-
-    console.log(data);
   });
   socket.on("telemetry", function(t) {
     var telemetry = JSON.parse(t);
@@ -119,7 +117,6 @@ $(function() {
   });
   $("#sliderSteering").on("input", function() {
     var newSteering = $(this).val();
-    console.log("New steering vector is " + newSteering);
     if (newSteering < 1 && newSteering > -1) {
       newSteering = 0;
       document.getElementById("sliderSteering").value = "0";
@@ -143,7 +140,6 @@ $(function() {
         TSTransport.X = _TSTransport.X;
         TSTransport.Y = _TSTransport.Y;
         ThumbStickSocket(JSON.stringify(TSTransport)); // send to server
-        console.log(TSTransport);
       }
 
     }
@@ -190,7 +186,6 @@ resetSliders = function() {
 };
 var compareThumbStickValues = function(X, Y)
 {
-  //console.log(`X: ${X} Y: ${Y} TSTTransport: ${TSTransport.X}, ${TSTransport.Y}`);
   if (TSTransport.X === X && TSTransport.Y === Y)
   {
     return true;

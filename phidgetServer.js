@@ -139,10 +139,14 @@ exports.phidgetServer = function () {
         diffSteer.flipAxis = -1; // Defaults to -1
         var testSteer = diffSteer( x, y)
         var conversionFactor = 1.000/255;
-        var newLeftVelocity = testSteer[0]*conversionFactor;
-        var newRightVelocity = testSteer[1]*conversionFactor;
+        var leftNewVelocity = testSteer[0]*conversionFactor;
+        var rightNewVelocity = testSteer[1]*conversionFactor;
         console.log(testSteer);
-        console.log(`New velocities after diffSteer. Left: ${newLeftVelocity}. Right: ${newRightVelocity}.`)
+        console.log(`New velocities after diffSteer. Left: ${leftNewVelocity}. Right: ${rightNewVelocity}.`)
+        ch1.setTargetVelocity(rightNewVelocity);
+        ch2.setTargetVelocity(rightNewVelocity);
+        ch3.setTargetVelocity(leftNewVelocity);
+        ch4.setTargetVelocity(leftNewVelocity);
     });
         //
     // Respond to commands to the motors

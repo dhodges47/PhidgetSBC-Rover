@@ -56,28 +56,23 @@ class ThumbStick {
       self.conn
         .connect()
         .then(function() {
-          console.log("local Phidget Server Connected (for thumbstick)");
           $("#lblThumbStickStatus").text(`Thumbstick is connected.`);
 
           PubSub.publish("thumbstick", "Connected");
           ch0.open(5000).then(function(ch0) {
             ch0.onVoltageRatioChange = ratioChangeAxis0;
-            console.log("channel open");
           })
           .catch(function(err) {
             console.log("failed to open the x channel:" + err);
           });
           ch1.open(5000).then(function(ch1) {
-            console.log("channel open");
             ch1.onVoltageRatioChange = ratioChangeAxis1;
           })
           .catch(function(err) {
             console.log("failed to open the y channel:" + err);
           });
           chDigital.open().then(function(chDigital) {
-            console.log("digital Input open");
             chDigital.onStateChange = stateChangeDigitalInput;
-            console.log("channel open");
             PubSub.publish("thumbstick-digitalInput", "x-axis open");
           })
           .catch(function(err) {
@@ -96,7 +91,7 @@ class ThumbStick {
       $("#lblThumbStickStatus").text(`Thumbstick Connection error: ${arg0}: ${arg1}`);
     };
     var onAttach = function(ch) {
-      console.log("axis attached");
+      //console.log("axis attached");
     };
     var ratioChangeAxis0 = function(ratio) {
       // console.log(`Axis 0: ${ratio}`);

@@ -78,24 +78,17 @@ const socketServer = function () {
       socket.on('velocity', function (data) {
         // this event comes from the slider on the web page. Values are from -100 to 100, with steps in value of 1. .
         // 0 is stopped. Negative numbers mean reverse direction. Positive numbers mean forwards direction.
-        console.log(`velocity change received: ${data}`);
         var v = math.round(data, 2);
         pubsub.publish(global.rovervelocity_command, v);
       });
       socket.on('steering', function (data) {
         // this event comes from the slider on the web page. Values are from -10.0 to 10.0, with steps of .1
-        console.log(`steering change received: ${data}`);
         var v = math.round(data, 2);
         pubsub.publish(global.roversteering_command, v);
       });
       socket.on('ThumbStick', function (data) {
           var TSTransport = JSON.parse(data);
-         // if (TSTransport.X == 0) {
-            //this tells the rover to stop.
-          //  pubsub.publish(global.rovervelocity_command, 0);
-          //  return;
-         // }
-          console.log(`Got a ThumbStick socket request. X: ${TSTransport.X} Y: ${TSTransport.Y}`);
+          //console.log(`Got a ThumbStick socket request. X: ${TSTransport.X} Y: ${TSTransport.Y}`);
          pubsub.publish(global.roverthumbstick_command, TSTransport);
       });
       pubsub.subscribe(global.roverconnection_status, function (msg, data) {
