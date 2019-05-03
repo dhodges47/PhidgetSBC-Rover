@@ -24,7 +24,9 @@ class ThumbStick {
     this.chDigital = new phidget22.DigitalInput();
     //ThumbStick Transport Object to send X and Y axis values to server
     this.tsTransport = {};
-
+    // when the thumbstick is at rest it doesn't go to full 0,0, so we adjust it manually
+    this.thresholdX = .1; // t
+    this.thresholdY = .1; //
     this.ThumbConnect = function() {
       // Axis 0 on the Thumbstick (y-axis)
       var ch0 = self.ch0;
@@ -98,11 +100,13 @@ class ThumbStick {
     };
     var ratioChangeAxis0 = function(ratio) {
       // console.log(`Axis 0: ${ratio}`);
+      ratio = (ratio > -self.thresholdY && ratio < self.thresholdY) ? 0 : ratio;
       self.tsTransport.Y = ratio;
       PubSub.publish("thumbstick", self.tsTransport);
     };
     var ratioChangeAxis1 = function(ratio) {
       // console.log(`Axis 1: ${ratio}`);
+      ratio = (ratio > -self.thresholdX && ratio < self.thresholdX)? 0 : ratio;
       self.tsTransport.X = ratio;
       PubSub.publish("thumbstick", self.tsTransport);
     };

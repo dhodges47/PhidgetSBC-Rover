@@ -90,11 +90,11 @@ const socketServer = function () {
       });
       socket.on('ThumbStick', function (data) {
           var TSTransport = JSON.parse(data);
-          if (TSTransport.X == 0) {
+         // if (TSTransport.X == 0) {
             //this tells the rover to stop.
-            pubsub.publish(global.rovervelocity_command, 0);
-            return;
-          }
+          //  pubsub.publish(global.rovervelocity_command, 0);
+          //  return;
+         // }
           console.log(`Got a ThumbStick socket request. X: ${TSTransport.X} Y: ${TSTransport.Y}`);
          pubsub.publish(global.roverthumbstick_command, TSTransport);
       });

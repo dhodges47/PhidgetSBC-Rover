@@ -143,6 +143,7 @@ $(function() {
         TSTransport.X = _TSTransport.X;
         TSTransport.Y = _TSTransport.Y;
         ThumbStickSocket(JSON.stringify(TSTransport)); // send to server
+        console.log(TSTransport);
       }
 
     }
