@@ -73,7 +73,6 @@ class ThumbStick {
           });
           chDigital.open().then(function(chDigital) {
             chDigital.onStateChange = stateChangeDigitalInput;
-            PubSub.publish("thumbstick-digitalInput", "x-axis open");
           })
           .catch(function(err) {
             console.log("failed to open the digital channel:" + err);

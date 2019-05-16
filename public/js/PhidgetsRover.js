@@ -99,7 +99,6 @@ $(function() {
   btnStopMotor_onClick = function() {
     socket.emit("steering", "0");
     socket.emit("velocity", "0");
-    stopThumbStick();
     resetSliders();
   };
   btnCancelSteering_onClick = function() {
@@ -145,7 +144,14 @@ $(function() {
     }
     function onThumbStickButton(msg, state)
     {
-
+      // state is always "true" if button is pressed, and "False" when the button is let go again.
+        console.log("Thumbstick Button Press: " + state)
+        if (state === true)
+        {
+          // stop the rover
+          socket.emit("steering", "0");
+          socket.emit("velocity", "0");
+        }
     }
     function ThumbStickSocket(objGP) {
         socket.emit("ThumbStick", objGP);
