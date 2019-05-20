@@ -27,8 +27,19 @@
             <div class="led-box">
               <div id="ledConnectionStatus" class="led-red"></div>
             </div>
-            <div class="ThumbStickStatus">
-            <span id="lblThumbStickStatus"></span>
+            <p class="card-text" id="lblRoverStatus" style="margin-left: -50px; padding-top: 15px;";></p>
+            <!-- Container for Alerts-->
+            <div class="divAbsolute">
+
+              <div class="AlertStatus">
+                <p class="card-text text-danger" id="lblTemperatureAlert"></p>
+              </div>
+              <div class="AlertStatus">
+                  <p class="card-text text-danger" id="lblProximityAlert"></p>
+                </div>
+              <div class="ThumbStickStatus">
+                  <p class="card-text text-info" id="lblThumbStickStatus"></p>
+               </div>
           </div>
           </div>
         </div>
@@ -84,10 +95,9 @@
       </div>
       <br /><br />
       <div class="card-columns">
-        <div class="card" style="height: 220px; ">
+        <div class="card" style="height: 240px; ">
           <div class="card-body text-center">
             <h5 class="card-title">Motor One (right front)</h5>
-            <span id="lblMotorOneStatus"></span>
             <canvas
               id="gaugeMotor1"
               data-type="radial-gauge"
@@ -98,13 +108,12 @@
               data-bar-shadow="5"
               data-color-bar-progress="rgba(50,200,50,.75)"
             ></canvas>
+            <p class="card-text" id="lblMotorOneStatus"></p>
           </div>
         </div>
-        <div class="card align-items-center" style="height: 220px; ">
+        <div class="card align-items-center" style="height: 240px; ">
           <div class="card-body text-center">
             <h5 class="card-title">Motor Two (right rear)</h5>
-
-            <span id="lblMotorTwoStatus"></span>
             <canvas
               id="gaugeMotor2"
               data-type="radial-gauge"
@@ -115,12 +124,12 @@
               data-bar-shadow="5"
               data-color-bar-progress="rgba(50,200,50,.75)"
             ></canvas>
+            <p class="card-text" id="lblMotorTwoStatus"></p>
           </div>
         </div>
-        <div class="card" style="height: 220px; ">
+        <div class="card" style="height: 240px; ">
           <div class="card-body text-center">
             <h5 class="card-title">Motor Three (left front)</h5>
-            <span id="lblMotorThreeStatus"></span>
             <canvas
               id="gaugeMotor3"
               data-type="radial-gauge"
@@ -131,12 +140,12 @@
               data-bar-shadow="5"
               data-color-bar-progress="rgba(50,200,50,.75)"
             ></canvas>
+            <p class="card-text" id="lblMotorThreeStatus"></p>
           </div>
         </div>
-        <div class="card" style="height: 220px; ">
+        <div class="card" style="height: 240px; ">
           <div class="card-body text-center">
             <h5 class="card-title">Motor Four(left rear)</h5>
-            <span id="lblMotorFourStatus"></span>
             <canvas
               id="gaugeMotor4"
               data-type="radial-gauge"
@@ -147,6 +156,7 @@
               data-bar-shadow="5"
               data-color-bar-progress="rgba(50,200,50,.75)"
             ></canvas>
+            <p class="card-text" id="lblMotorFourStatus"></p>
           </div>
         </div>
       </div>
@@ -283,11 +293,11 @@
     <script src="/js/packages/sha256.min.js"></script>
     <!-- Phidgets interface, from Phidgets web site-->
     <script src="/js/packages/phidget22.min.js"></script>
-    <!-- ThumbStick.js is custom developed to handle the Thumbstick phidget for this project.
+    <!-- ThumbStick.js is custom developed by me to handle the Thumbstick phidget for this project.
     It requires that the Phidget server be running locally and that the Thumbstick be connected
      to a Vint which is connected via USB locally-->
     <script src="/js/ThumbStick.js"></script>
-    <!-- PhidgetsRover.js is custom developed to handle the user interface and backend communication for this project.
+    <!-- PhidgetsRover.js is custom developed by me to handle the user interface and backend communication for this project.
     It is the main control program for the rover.-->
     <script src="/js/PhidgetsRover.js"></script>
 

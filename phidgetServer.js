@@ -230,8 +230,9 @@ exports.phidgetServer = function () {
         };
 
         _ch.onDistanceChange = function (distance) {
-            var sensorLocation = "front"
-            if (! _ch.getHubPort() == distanceFront.hubPort)
+            var sensorLocation = "front";
+            var thisHubPort= _ch.getHubPort();
+            if (_ch.getHubPort() != distanceFront.hubPort)
             {
                 sensorLocation = "back";
             }
@@ -266,7 +267,7 @@ exports.phidgetServer = function () {
     var startDistanceSensors = function () {
         // start distance sensors
         startDistanceSensor(dist1, distanceFront.hubSerialNumber, distanceFront.hubPort)
-        startDistanceSensor(dist1, distanceRead.hubSerialNumber, distanceRear.hubPort)
+        startDistanceSensor(dist2, distanceRear.hubSerialNumber, distanceRear.hubPort)
 
     }
     var stopAllMotors = function () {

@@ -336,7 +336,25 @@ input[type="range"]:focus::-ms-fill-upper {
 .ThumbStickStatus {
   text-align: left;
   font-size: smaller;
+  position: relative;
+
+}
+.AlertStatus {
+  text-align: left;
+  font-size: large;
+  color: red;
+  position: relative;
+
+}
+.divRelative
+{
+  position: relative;
+
+}
+.divAbsolute
+{
   position: absolute;
-  bottom: 0;
-  padding-bottom: 15px;
+  top: 150px;
+  width: 100%;
+
 }

@@ -56,19 +56,62 @@ $(function() {
         case "temperatureSensor":
           if (telemetry.event == "temperature") {
             var celsius = telemetry.value;
-            var farenheit = (celsius * 9) / 5 + 32;
-            // TO DO decide how to display temperature, especially when it is high
+            var hubPort = telemetry.sourceIndex;
+            var farenheit = ((celsius * 9) / 5 + 32).toFixed(2);
+            // note: Phidgets maximum operating temp is 85 C, or 185F
+            // we'll display an alert if it gets close to that number
+            var maxCelsius = 85;
+            if (celsius >= maxCelsius)
+            {
+              $("#lblTemperatureAlert").text("Controller temperature is dangerously high!");
+            }
+            else{
+              $("#lblTemperatureAlert").text("");
+            }
+            switch (hubPort) {
+              case 0:
+                $("#lblMotorOneStatus").text(`Temperature: ${farenheit} F`);
+                break;
+              case 1:
+              $("#lblMotorTwoStatus").text(`Temperature: ${farenheit} F`);
+              break;
+                break;
+              case 2:
+              $("#lblMotorThreeStatus").text(`Temperature: ${farenheit} F`);
+              break;
+                break;
+              case 3:
+              $("#lblMotorFourStatus").text(`Temperature: ${farenheit} F`);
+              break;
+                break;
+            }
           }
           break;
         case "distanceSensor":
           if (telemetry.event == "distance") {
             var distanceSensor = telemetry.sourceIndex; // will be either "front" or "back"
+            var distance = telemetry.value;
+            if (distance <= 80) // 80 mm = 3 inches
+
+            {
+              // too close to obstacle, so stop the rover
+              socket.emit("steering", "0");
+              socket.emit("velocity", "0");
+              resetSliders();
+              $("#lblProximityAlert").text(`Too close to obstacle, stopping rover (${distance} mm)`);
+            }
+            if (distance >= 170)
+            {
+              $("#lblProximityAlert").text('');
+            }
+            else
+            {
             if (distanceSensor == "front") {
-              //var gauge1 = document.gauges.get("distanceGaugeFront");
-              //gauge1.value = telemetry.value;
+              $("#lblProximityAlert").text(`Getting close to obstacle: Front sensor distance is ${distance} mm`);
+
             } else {
-              //var gauge1 = document.gauges.get("distanceGaugeRear");
-              //gauge1.value = telemetry.value;
+              $("#lblProximityAlert").text(`Getting close to obstacle: Read sensor distance is ${distance} mm`);
+            }
             }
           }
           break;
@@ -84,6 +127,7 @@ $(function() {
   //
   btnConnect_onClick = function() {
     $("#ledConnectionStatus").attr("class", "led-yellow");
+    $("#lblRoverStatus").text('Connecting');
     socket.emit("connectRover", "true");
     startThumbStick();
     resetSliders();
@@ -91,6 +135,7 @@ $(function() {
   };
   btnDisConnect_onClick = function() {
     $("#ledConnectionStatus").attr("class", "led-yellow");
+    $("#lblRoverStatus").text('DisConnecting');
     socket.emit("connectRover", { setting: "false" });
     stopThumbStick();
     resetSliders();
@@ -178,9 +223,11 @@ stopThumbStick = function () {
 UpdateRoverConnectionStatus = function(data) {
   if (data == "Rover is connected") {
     $("#ledConnectionStatus").attr("class", "led-green");
+    $("#lblRoverStatus").text('Connected');
     bRover = true;
   } else {
     $("#ledConnectionStatus").attr("class", "led-red");
+    $("#lblRoverStatus").text('Disconnected');
     bRover = false;
   }
 };
