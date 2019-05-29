@@ -4,10 +4,14 @@
  * various addresses, constants, and classes common to both app.js and phidgetServer.js
  ***********************************************************************/
 //
-// network addresses (for reference)
+// network addresses 
 //
-WebCamAddress= "http://phidgetsbc.local:81/?action=stream";
-PhidgetSBCServer = "http://phidgetsbc.local:5661";
+exports.WebCamAddress= "http://phidgetsbc.local:81/?action=stream";
+exports.PhidgetSBCServer = "phidgetsbc.local";
+exports.PhidgetsSBCServerPort = 5661
+//WebCamAddress= "http://192.168.99.1:81/?action=stream";
+//PhidgetSBCServer = "http://192.168.99.1:5661";
+
 LocalWebAdminPage = "http://localhost:3001";
 
 // pubsub topics

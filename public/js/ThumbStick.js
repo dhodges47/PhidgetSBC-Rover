@@ -93,12 +93,14 @@ class ThumbStick {
       //console.log("axis attached");
     };
     var ratioChangeAxis0 = function(ratio) {
+      ratio = -ratio;
       // console.log(`Axis 0: ${ratio}`);
       ratio = (ratio > -self.thresholdY && ratio < self.thresholdY) ? 0 : ratio;
       self.tsTransport.Y = ratio;
       PubSub.publish("thumbstick", self.tsTransport);
     };
     var ratioChangeAxis1 = function(ratio) {
+      //ratio = -ratio;
       // console.log(`Axis 1: ${ratio}`);
       ratio = (ratio > -self.thresholdX && ratio < self.thresholdX)? 0 : ratio;
       self.tsTransport.X = ratio;

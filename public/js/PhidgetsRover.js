@@ -4,8 +4,19 @@ var TSTransport = {};
 // axes (ie thumbsticks)
 TSTransport.X = 0.0;  // velocity
 TSTransport.Y = 0.0;  // steering
+//
+  // initialize distance for the distance sensors
+  //
+  var distanceFront = 0;
+  var distanceRear = 0;
+
 // initialize socket communication with server
 var socket;
+
+// Global variable to indicate whether rover is stopped or not
+var isRoverStopped = true;
+
+
 $(function() {
     //
     // initialize thumbstick
@@ -23,6 +34,8 @@ $(function() {
   var gauge2 = document.gauges.get("gaugeMotor2");
   var gauge3 = document.gauges.get("gaugeMotor3");
   var gauge4 = document.gauges.get("gaugeMotor4");
+
+
 
   // handle various socket messages from the server
   socket.on("connectionStatus", function(data) {
@@ -51,6 +64,7 @@ $(function() {
                 gauge4.value = Math.abs(v * 100);
                 break;
             }
+            SetIsRoverStopped(v);
           }
           break;
         case "temperatureSensor":
@@ -91,26 +105,36 @@ $(function() {
           if (telemetry.event == "distance") {
             var distanceSensor = telemetry.sourceIndex; // will be either "front" or "back"
             var distance = telemetry.value;
-            if (distance <= 80) // 80 mm = 3 inches
+            if (distanceSensor == "front") {
+              distanceFront = telemetry.value;
+            }
+            else{
+              distanceRear = telemetry.value;
+            }
+            if (distanceFront <= 80 || distanceRear <= 80) // 80 mm = 3 inches
 
             {
               // too close to obstacle, so stop the rover
-              socket.emit("steering", "0");
-              socket.emit("velocity", "0");
-              resetSliders();
-              $("#lblProximityAlert").text(`Too close to obstacle, stopping rover (${distance} mm)`);
+              if (! isRoverStopped)
+              {
+                socket.emit("steering", "0");
+                socket.emit("velocity", "0");
+                resetSliders();
+                SetIsRoverStopped(0);
+                $("#lblProximityAlert").text(`Too close to obstacle, stopping rover.`);
+              }
             }
-            if (distance >= 170)
+            if (distanceFront >= 170 && distanceRear >= 170)
             {
               $("#lblProximityAlert").text('');
             }
             else
             {
-            if (distanceSensor == "front") {
-              $("#lblProximityAlert").text(`Getting close to obstacle: Front sensor distance is ${distance} mm`);
+            if (distanceSensor == "front" && distanceFront < 170) {
+              $("#lblProximityAlert").text(`Getting close to obstacle: Front sensor distance is ${distanceFront} mm`);
 
-            } else {
-              $("#lblProximityAlert").text(`Getting close to obstacle: Read sensor distance is ${distance} mm`);
+            } else if(distanceSensor == "back" && distanceRear < 170){
+              $("#lblProximityAlert").text(`Getting close to obstacle: Rear sensor distance is ${distanceRear} mm`);
             }
             }
           }
@@ -145,6 +169,7 @@ $(function() {
     socket.emit("steering", "0");
     socket.emit("velocity", "0");
     resetSliders();
+    SetIsRoverStopped(0)
   };
   btnCancelSteering_onClick = function() {
     socket.emit("steering", 0);
@@ -171,6 +196,15 @@ $(function() {
 
   console.log("ready!");
 }); // end of document.ready section
+function SetIsRoverStopped(v) {
+  if (v == 0) {
+    isRoverStopped = true;
+  }
+  else {
+    isRoverStopped = false;
+  }
+}
+
 //
   // handlers for ThumbStick
   //
@@ -244,4 +278,4 @@ var compareThumbStickValues = function(X, Y)
     return true;
   }
   return false;
- }
+}

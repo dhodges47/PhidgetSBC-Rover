@@ -30,7 +30,8 @@ var velocity = 0.00; // current velocity before steering adjustments
 // phidgetServer is the main class to handle events from the phidgets server and from the node server
 exports.phidgetServer = function () {
 
-    var conn = new phidget22.Connection(5661, 'phidgetsbc.local');
+   var conn = new phidget22.Connection(global.PhidgetsSBCServerPort, global.PhidgetSBCServer);
+  // var conn = new phidget22.Connection(5661, '192.168.99.1');
     //
     // respond to connection commands
     //
@@ -133,7 +134,7 @@ exports.phidgetServer = function () {
         var TSTransport = data;
         var x = TSTransport.X;
         var y = TSTransport.Y;
-        console.log(TSTransport);
+        //console.log(TSTransport);
         // experiment with diffsteer package
         // diffsteer assumes both velocity and steering (X and Y) will be in the range of -1 to 1.
         diffSteer.flipAxis = -1; // Defaults to -1
@@ -159,10 +160,10 @@ exports.phidgetServer = function () {
         _ch.setChannel(0);
         _ch.setHubPort(hubPort);
         _ch.onAttach = function () {
-            console.log(`Motor ${hubPort} attached`);
+           // console.log(`Motor ${hubPort} attached`);
         }
         _ch.onDetach = function () {
-            console.log(`Motor ${hubPort} detached`);
+           // console.log(`Motor ${hubPort} detached`);
         }
         _ch.onVelocityUpdate = function( velocity) {
 
@@ -177,10 +178,10 @@ exports.phidgetServer = function () {
 
         }
         _ch.open().then(function (_ch) {
-            console.log(`channel ${_ch.getHubPort()} open`);
+           // console.log(`channel ${_ch.getHubPort()} open`);
 
         }).catch(function (err) {
-            console.log(`failed to open the channel: ${err}`);
+           // console.log(`failed to open the channel: ${err}`);
         });
     }
     var startTemperatureSensor = function(_ch, hubSerialNumber, hubPort)
@@ -191,13 +192,13 @@ exports.phidgetServer = function () {
         _ch.setHubPort(hubPort);
 
         _ch.onAttach = function (ch) {
-            console.log(ch + ' attached');
-            console.log('min temperature:' + ch.getMinTemperature());
-            console.log('max temperature:' + ch.getMaxTemperature());
+           // console.log(ch + ' attached');
+          //  console.log('min temperature:' + ch.getMinTemperature());
+          //  console.log('max temperature:' + ch.getMaxTemperature());
         };
 
         _ch.onDetach = function (ch) {
-            console.log(ch + ' detached');
+           // console.log(ch + ' detached');
         };
 
         _ch.onTemperatureChange = function (temp) {
@@ -207,9 +208,9 @@ exports.phidgetServer = function () {
         };
 
         _ch.open().then(function (ch) {
-            console.log('temperature channel open');
+           // console.log('temperature channel open');
         }).catch(function (err) {
-            console.log('failed to open the channel:' + err);
+          //  console.log('failed to open the channel:' + err);
         });
 
     }
@@ -220,13 +221,13 @@ exports.phidgetServer = function () {
         _ch.setChannel(0);
         _ch.setHubPort(hubPort);
         _ch.onAttach = function (ch) {
-            console.log(ch + ' attached');
-            console.log('Min Distance:' + ch.getMinDistance());
-            console.log('Max Distance:' + ch.getMaxDistance());
+           // console.log(ch + ' attached');
+           // console.log('Min Distance:' + ch.getMinDistance());
+           // console.log('Max Distance:' + ch.getMaxDistance());
         };
 
         _ch.onDetach = function (ch) {
-            console.log(ch + ' detached');
+           // console.log(ch + ' detached');
         };
 
         _ch.onDistanceChange = function (distance) {
@@ -247,9 +248,9 @@ exports.phidgetServer = function () {
         };
 
         _ch.open().then(function (ch) {
-            console.log('Distance Sensor channel open');
+           // console.log('Distance Sensor channel open');
         }).catch(function (err) {
-            console.log('failed to open the Distance Sensor channel:' + err);
+           // console.log('failed to open the Distance Sensor channel:' + err);
         });
     }
     var startMotors = function () {
