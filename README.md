@@ -18,9 +18,9 @@ Thumbstick capabilities:
 While it is a simple control, similar to one thumbstick on a game controller, this device is all we need to control the robot.
 It has an X axis, which governs steering, and a Y axis, which governs velocity. The combination of X and Y values create a vector for direction and speed.
 It also has a digital pushbutton. If you push down on the thumbstick, it creates an event. We have programmed that button to be an emergency brake. When clicked, it will bring the rover to a halt.
+<img src='https://github.com/dhodges47/PhidgetSBC-Rover/blob/master/public/images/RobotRightSide.jpg'>
 
-
-![Stalker Rover](/public/images/DSC_6977-edited.jpg){:height="50%" width="50%"}
+![Stalker Rover](https://github.com/dhodges47/PhidgetSBC-Rover/blob/master/public/images/RobotRightSide.jpg)
 
 
 **Hardware**
