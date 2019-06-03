@@ -7,23 +7,24 @@ The rover communicates with the control program using a private wi-fi hotspot ho
 The control program runs on a laptop. It is written entirely in javascript using Node.js.
 It allows you to remote control the rover using a Phidgets Thumbstick.
 
-Rover capabilities:
+## Rover capabilities:
 1. Independent control of each wheel's motor: start, accelerate, stop
 2. Differential steering, in which steering is accomplished by controlled the rate of speed of the left and right-side motors.
 3. Front and rear sonar sensors. These are used for distance readings and for detecting proximity to barriers. The software will stop the rover if it gets too close to a barrier.
 4. Telemetry data stream back to the host program, including velocity, distance, temperature, voltages, and other values.
 5. Live video camera feed
 
-Thumbstick capabilities:
+## Thumbstick capabilities:
 While it is a simple control, similar to one thumbstick on a game controller, this device is all we need to control the robot.
 It has an X axis, which governs steering, and a Y axis, which governs velocity. The combination of X and Y values create a vector for direction and speed.
 It also has a digital pushbutton. If you push down on the thumbstick, it creates an event. We have programmed that button to be an emergency brake. When clicked, it will bring the rover to a halt.
-<img src='https://github.com/dhodges47/PhidgetSBC-Rover/blob/master/public/images/RobotRightSide.jpg'>
+
 
 ![Stalker Rover](https://github.com/dhodges47/PhidgetSBC-Rover/blob/master/public/images/RobotRightSide.jpg)
+![Stalker Rover with Control Panel](https://github.com/dhodges47/PhidgetSBC-Rover/blob/master/public/images/DSC_6977-edited.jpg)
 
 
-**Hardware**
+## Hardware
 
 Phidgets SBC4
 
@@ -42,19 +43,18 @@ Hardware Chassis: Nomad from ServoCity: https://www.servocity.com/nomad  It incl
 Various wires, switches,  and cable ties.
 
 
-**Software**
+## Software
+* Visual Studio Code
 
+* Node.js and various libraries (see below)
 
+* phidget22.js
 
-    Visual Studio Code
+* Javascript
 
-    Node.js and various libraries (see below)
+*  This repository
 
-    Javascript
-
-    This repository
-
-Notes about this Repository
+## Notes about this Repository
 While there are many files in this repository, the following are the key files to look at to understand how the rover software works:
 
 app.js - the main loop of the node.js server application. It communicates with the web page using sockets.io.
@@ -67,7 +67,7 @@ public/js/PhidgetsRover.js - this script is the interface between the web page a
 public/js/ThumbStick.js - this script handles the ThumbStick interface between the local PhidgetsServer and the node.js server.
 
 
-Detailed notes on setting up the software:
+## Detailed notes on setting up the software:
 
 Software can be developed either on a Mac or on Windows.
 
@@ -105,7 +105,7 @@ npx gitignore node
 ```
 Click the source control icon and then "create repository" from the top menu.
 
-This will create a git repository and will stage all the files that have been generated or added to your new application.
+This will create a local git repository and will stage all the files that have been generated or added to your new application.
 
 Then Enter a commit message like "Initial Commit" and click cmd-enter to initialize all your files in source control.
 
@@ -113,30 +113,29 @@ Not only does this help prevent you from disaster if you make accidental changes
 
 Commit early, commit often. (Every development day, at least)
 
-Now you are ready to clone the repository into the PhidgetsRover folder, making sure that app.js, phidgetsServer.js, and constants.js are in the root of the PhidgetsRover Folder.
 
-In Visual Studio Code, create 2 more files in the PhidgetsRover folder:
+Now you are ready to clone the repository into the PhidgetsRover folder, making sure that app.js, phidgetsServer.js, and constants.js end up the root of the PhidgetsRover Folder.
 
-app.js is the starting point and main loop of the server application. It manages communication with the browser. It serves the web page to the requesting browser, and sets up two way communication with it using socket.io.
+
+**app.js** is the starting point and main loop of the server application. It manages communication with the browser. It serves the web page to the requesting browser, and sets up two way communication with it using socket.io.
 
 It also sets up two way communication with the phidgetServer using pubsub.js.
 
-phidgetServer.js is the script that talks to the rover. It sends commands to the rover, and relays back status information.
+**phidgetServer.js** is the script that talks to the rover. It sends commands to the rover, and relays back status information.
 
-constant.js contains names for values that are shared between app.js and phidgetServer.js. It also contains names for values that might change, like the id's for the various controllers. The idea for constants is that, if the values change, you just have to change them in the constant file, rather than searching and replacing them in all the code.
+**constant.js** contains names for values that are shared between app.js and phidgetServer.js. It also contains names for values that might change, like the id's for the various controllers. The idea for constants is that, if the values change, you just have to change them in the constant file, rather than searching and replacing them in all the code.
 
-After cloning the repository from GitHub, you will find a public folder. This contains the index.html and supporting files for the web page that displays the Control Panel to the user.
+After cloning the repository from GitHub, you should also find a folder called "public". This contains the index.html and supporting files for the web page that displays the Control Panel to the user.
 
-If all is well, you should be able to run the program in Visual Studio using the debug tab, with a nodes profile.
+If all is well, you should be able to run the program in Visual Studio using the debug tab. If it asks you for a debug profile, select "node"
 
 Then, if you open a web page to http://localhost:3001, you should see the Control Panel.
 
-** A note about the Phidgets Server **
+## A note about the two Phidgets Servers and the node.js server
 
-Phidgets provides the low-level interface to their hardware components, which make it an excellent platform for rapid development of software controlled hardware projects.
-Phidgets also provides their Phidgets Server, which provides an interface to their components that doesn't require any programming.
+When this project is up and running, there will be 3 different servers running. One will be on the Rover's SBC itself. Two will be on the laptop that will be used to control the rover.
 
-There are two Phidgets servers, and a Node.js web server, running in this project:
+
 1) On the rover itself, the SBC4 is running a Phidgets Server by default. This server provides the API that is used for remote control of the vehicle.
 2) On the laptop, we also need to run the Phidgets Server, but for only one purpose: to interface to the Thumbstick control. Thumbstick data goes through a VINT connection to a USB port on the laptop, where it is read by the Phidgets Server. There is a script called "thumbstick.js" in the public/js folder that gets Thumbstick data from the Phidgets Server.
 3) On the laptop we also run a node.js server in order to host the code in this repository. This server provides serveral functions:
