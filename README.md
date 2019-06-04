@@ -1,5 +1,5 @@
 # Phidgets Rover
-A 4 wheel driver rover, controlled by Phidgets components (https://www.phidgets.com).
+A 4 wheel drive Rover, controlled by Phidgets components (https://www.phidgets.com).
 The chassis is a Nomad from ServoCity.
 
 The brains of the rover is a Phidgets SBC4 (Single Board Computer).
@@ -57,14 +57,18 @@ Various wires, switches,  and cable ties.
 ## Notes about this Repository
 While there are many files in this repository, the following are the key files to look at to understand how the rover software works:
 
-app.js - the main loop of the node.js server application. It communicates with the web page using sockets.io.
-phidgetServer.js - This script relays commands from app.js to the Rover, and relays telemetry data from the Rover to app.js, for sending to the web page.
-constants.js - This script contains global variables for both app.js and phidgetServerjs.
+**app.js** - the main loop of the node.js server application. It communicates with the web page using sockets.io.
+
+**phidgetServer.js** - This script relays commands from app.js to the Rover, and relays telemetry data from the Rover to app.js, for sending to the web page.
+
+**constants.js** - This script contains global variables for both app.js and phidgetServerjs.
 Inter-process communication between app.js and phidgetServer.js uses pubsub.js for asynchronous message queuing.
 
-public/index.html - the Web Page that provides the user interface for the Rover.
-public/js/PhidgetsRover.js - this script is the interface between the web page and the node.js server, for two-way communicaton using sockets.io.
-public/js/ThumbStick.js - this script handles the ThumbStick interface between the local PhidgetsServer and the node.js server.
+**public/index.html** - the Web Page that provides the user interface for the Rover.
+
+**public/js/PhidgetsRover.js** - this script is the interface between the web page and the node.js server, for two-way communicaton using sockets.io.
+
+**p**ublic/js/ThumbStick.js** - this script handles the ThumbStick interface between the local PhidgetsServer and the node.js server.
 
 
 ## Detailed notes on setting up the software:
@@ -73,7 +77,7 @@ Software can be developed either on a Mac or on Windows.
 
 Install Visual Studio Code ( https://code.visualstudio.com/)
 
-Install Nodejs (go to Nodejs.org and download the package and install it)
+Install Node.js (go to Nodejs.org and download the package and install it)
 
 Create a folder called "Robotics".
 
@@ -137,7 +141,9 @@ When this project is up and running, there will be 3 different servers running. 
 
 
 1) On the rover itself, the SBC4 is running a Phidgets Server by default. This server provides the API that is used for remote control of the vehicle.
+
 2) On the laptop, we also need to run the Phidgets Server, but for only one purpose: to interface to the Thumbstick control. Thumbstick data goes through a VINT connection to a USB port on the laptop, where it is read by the Phidgets Server. There is a script called "thumbstick.js" in the public/js folder that gets Thumbstick data from the Phidgets Server.
-3) On the laptop we also run a node.js server in order to host the code in this repository. This server provides serveral functions:
+
+3) On the laptop we run a node.js server in order to host the code in this repository. This server provides serveral functions:
 a) It communicates with the Phidgets Server on the Rover's SBC4 via wi-fi, through the phidget22.js library that is available on the phidgets web site.
 b) It hosts a web page that runs in a browser on the laptop at the address http://localhost:3001. It receives commands from the web page (and thumbstick) and relays them to the rover. It also collects rover telemetry data and sends it back to the web page for display.
