@@ -6,7 +6,7 @@ The brains of the rover is a Phidgets SBC4 (Single Board Computer).
 The rover communicates with the control program using a private wi-fi hotspot hosted by the Phidgets SBC4.
 The control program runs on a laptop. It is written entirely in javascript using Node.js.
 It allows you to remote control the rover using a Phidgets Thumbstick.
-
+[YouTube how-to video](https://youtu.be/1tI489o2_5U)
 ## Rover capabilities:
 1. Independent control of each wheel's motor: start, accelerate, stop
 2. Differential steering, in which steering is accomplished by controlled the rate of speed of the left and right-side motors.
