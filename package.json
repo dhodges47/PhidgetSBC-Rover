@@ -14,7 +14,7 @@
     "express": "~4.16.0",
     "mathjs": "^5.6.0",
     "morgan": "~1.9.0",
-    "phidget22": "^2.0.11",
+    "phidget22": "^2.6.14",
     "pubsub-js": "^1.7.0",
     "socket.io": "^2.2.0"
   }
